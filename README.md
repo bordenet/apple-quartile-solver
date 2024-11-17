@@ -12,3 +12,5 @@ Sample 1:
 
 Sample 2:
 `clear && go build -o applequartile && ./applequartile --debug --dictionary ./prolog/wn_s.pl --puzzle ./puzzle2.txt`
+
+![image](https://github.com/user-attachments/assets/76c7617c-4eb6-4822-a9ea-f578a1cad161)
