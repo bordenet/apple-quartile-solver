@@ -72,13 +72,15 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
         re := regexp.MustCompile(`s\(\d+,\d+,'([^']+)',([nv]),\d+,\d+\)\.`)
         matches := re.FindStringSubmatch(line)
         if len(matches) == 3 {
-            word := strings.ToLower(strings.TrimSpace(matches[1]))
+            word := strings.TrimSpace(matches[1])
             partOfSpeech := matches[2]
 
             // Skip capitalized words
             if len(word) > 0 && word[0] >= 'A' && word[0] <= 'Z' {
                 continue
             }
+            
+            word = strings.ToLower(word)
 
             // Insert the original word into the trie
             trie.Insert(word)
