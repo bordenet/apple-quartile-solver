@@ -5,6 +5,7 @@ import (
     "flag"
     "fmt"
     "os"
+    "regexp"
     "strings"
     "time"
 )
@@ -75,25 +76,31 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
             fmt.Printf(Gray+"Reading line: %s"+Reset+"\n", line)
         }
 
-        // Extract the word from the Prolog format
-        parts := strings.SplitN(line, "'", 3)
-        if len(parts) >= 3 {
-            word := parts[1]
-            word = strings.ToLower(strings.TrimSpace(word))
+        // Use regex to extract the relevant parts from the input format
+        re := regexp.MustCompile(`s\(\d+,\d+,'([^']+)',([nv]),\d+,\d+\)\.`)
+        matches := re.FindStringSubmatch(line)
+        if len(matches) == 3 {
+            word := strings.TrimSpace(matches[1])
+            partOfSpeech := matches[2]
 
-            // Skip short words (e.g., less than 3 characters)
-            if len(word) < 3 {
+            if (!isCapitalized(word)) {
+                // Insert the original word into the trie
+                trie.Insert(word)
                 if debug {
-                    fmt.Printf(Gray+"Skipping short word: %s"+Reset+"\n", word)
+                    fmt.Printf(Gray+"Inserted word into trie: %s"+Reset+"\n", word)
                 }
-                continue
-            }
+                wordCount++
 
-            trie.Insert(word)
-            if debug {
-                fmt.Printf(Gray+"Inserted word into trie: %s"+Reset+"\n", word)
+                // If it's a noun, also insert the plural form
+                if partOfSpeech == "n" {
+                    plural := word + "s"
+                    trie.Insert(plural)
+                    if debug {
+                        fmt.Printf(Gray+"Inserted plural form into trie: %s"+Reset+"\n", plural)
+                    }
+                    wordCount++
+                }
             }
-            wordCount++
         } else {
             if debug {
                 fmt.Printf(Gray+"Failed to parse line: %s"+Reset+"\n", line)
@@ -106,6 +113,14 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
     }
 
     return wordCount, nil
+}
+
+// isCapitalized checks if the first character of the string is uppercase.
+func isCapitalized(s string) bool {
+    if len(s) == 0 {
+        return false // Return false for empty strings
+    }
+    return s[0] >= 'A' && s[0] <= 'Z'
 }
 
 func readTextFile(path string) ([]string, error) {
@@ -133,7 +148,6 @@ func readTextFile(path string) ([]string, error) {
 
 func generateConcatenatedPermutations(lines []string, maxLines int) []string {
     var results []string
-//    n := len(lines)
 
     for i := 1; i <= maxLines; i++ {
         combinations := combinations(lines, i)
@@ -161,10 +175,12 @@ func combinations(lines []string, r int) [][]string {
 }
 
 func checkInTrie(trie *TrieNode, permutations []string, debug bool) {
+    var i int = 0
     for _, perm := range permutations {
         if trie.Search(perm) {
-            fmt.Printf(Green+"Found in trie: %s"+Reset+"\n", perm)
-        } else if debug {
+            i++
+            fmt.Printf(Gray+"%2d. " + Green + "%s"+Reset+"\n", i, perm)
+            } else if debug {
             fmt.Printf(Red+"Not found in trie: %s"+Reset+"\n", perm)
         }
     }
@@ -207,24 +223,4 @@ func main() {
 
     permutations := generateConcatenatedPermutations(lines, 4)
     checkInTrie(trie, permutations, *debug)
-
-    // Accept user input for up to 12 characters
-    reader := bufio.NewReader(os.Stdin)
-    fmt.Print("Enter up to 12 characters: ")
-    input, _ := reader.ReadString('\n')
-    input = strings.TrimSpace(strings.ToLower(input))
-
-    if len(input) > 12 {
-        fmt.Println("Input exceeds 12 characters.")
-        return
-    }
-
-    searchStartTime := time.Now()
-    if trie.Search(input) {
-        fmt.Printf(Green+"%s is in the dictionary"+Reset+"\n", input)
-    } else {
-        fmt.Printf(Red+"%s is not in the dictionary"+Reset+"\n", input)
-    }
-    searchDuration := time.Since(searchStartTime)
-    fmt.Printf("Search completed in %v\n", searchDuration)
 }
