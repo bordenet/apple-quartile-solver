@@ -12,10 +12,10 @@ import (
 
 // ANSI color codes
 const (
-    Reset  = "\033[0m"
-    Gray   = "\033[90m"
-    Green  = "\033[32m"
-    Red    = "\033[31m"
+    Reset = "\033[0m"
+    Gray  = "\033[90m"
+    Green = "\033[32m"
+    Red   = "\033[31m"
 )
 
 type TrieNode struct {
@@ -52,14 +52,6 @@ func (t *TrieNode) Search(word string) bool {
     return node.IsEnd
 }
 
-func (t *TrieNode) CountNodes() int {
-    count := 1 // Count the current node
-    for _, child := range t.Children {
-        count += child.CountNodes()
-    }
-    return count
-}
-
 func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, error) {
     dictionaryFile, err := os.Open(dictionaryPath)
     if err != nil {
@@ -80,26 +72,33 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
         re := regexp.MustCompile(`s\(\d+,\d+,'([^']+)',([nv]),\d+,\d+\)\.`)
         matches := re.FindStringSubmatch(line)
         if len(matches) == 3 {
-            word := strings.TrimSpace(matches[1])
+            word := strings.ToLower(strings.TrimSpace(matches[1]))
             partOfSpeech := matches[2]
 
-            if (!isCapitalized(word)) {
-                // Insert the original word into the trie
-                trie.Insert(word)
-                if debug {
-                    fmt.Printf(Gray+"Inserted word into trie: %s"+Reset+"\n", word)
-                }
-                wordCount++
+            // Skip capitalized words
+            if len(word) > 0 && word[0] >= 'A' && word[0] <= 'Z' {
+                continue
+            }
 
-                // If it's a noun, also insert the plural form
-                if partOfSpeech == "n" {
-                    plural := word + "s"
-                    trie.Insert(plural)
-                    if debug {
-                        fmt.Printf(Gray+"Inserted plural form into trie: %s"+Reset+"\n", plural)
-                    }
-                    wordCount++
-                }
+            // Insert the original word into the trie
+            trie.Insert(word)
+            wordCount++
+
+            // Handle plural nouns
+            if partOfSpeech == "n" {
+                plural := word + "s"
+                trie.Insert(plural)
+                wordCount++
+            }
+
+            // Handle verb forms
+            if partOfSpeech == "v" {
+                // Add common verb forms
+                past := word + "ed"
+                presentParticiple := word + "ing"
+                trie.Insert(past)
+                trie.Insert(presentParticiple)
+                wordCount += 2 // Count both forms
             }
         } else {
             if debug {
@@ -115,38 +114,7 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
     return wordCount, nil
 }
 
-// isCapitalized checks if the first character of the string is uppercase.
-func isCapitalized(s string) bool {
-    if len(s) == 0 {
-        return false // Return false for empty strings
-    }
-    return s[0] >= 'A' && s[0] <= 'Z'
-}
-
-func readTextFile(path string) ([]string, error) {
-    file, err := os.Open(path)
-    if err != nil {
-        return nil, err
-    }
-    defer file.Close()
-
-    var lines []string
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        line := strings.TrimSpace(scanner.Text())
-        if line != "" {
-            lines = append(lines, line)
-        }
-    }
-
-    if err := scanner.Err(); err != nil {
-        return nil, err
-    }
-
-    return lines, nil
-}
-
-func generateConcatenatedPermutations(lines []string, maxLines int) []string {
+func generatePermutations(lines []string, maxLines int) []string {
     var results []string
 
     for i := 1; i <= maxLines; i++ {
@@ -158,7 +126,7 @@ func generateConcatenatedPermutations(lines []string, maxLines int) []string {
     return results
 }
 
-func combinations(lines []string, r int) [][]string {
+func combinations(arr []string, r int) [][]string {
     var result [][]string
     var f func([]string, int, []string)
     f = func(arr []string, n int, temp []string) {
@@ -170,7 +138,7 @@ func combinations(lines []string, r int) [][]string {
             f(arr, i+1, append(temp, arr[i]))
         }
     }
-    f(lines, 0, []string{})
+    f(arr, 0, []string{})
     return result
 }
 
@@ -195,7 +163,7 @@ func main() {
     startTime := time.Now()
 
     if *dictionaryPath == "" || *puzzlePath == "" {
-        fmt.Println("Usage: applequartile [--debug] --dictionary <dictionary_path> --puzzle <text_file_path>")
+        fmt.Println("Usage: applequartile [--debug] --dictionary <path> --puzzle <path>")
         return
     }
 
@@ -211,16 +179,32 @@ func main() {
     loadDuration := time.Since(startTime)
     if *debug {
         fmt.Printf("Parsed words into trie: %d\n", wordCount)
-        fmt.Printf("Number of nodes in trie: %d\n", trie.CountNodes())
         fmt.Printf("Loaded words into the trie in %v\n", loadDuration)
     }
 
-    lines, err := readTextFile(*puzzlePath)
+    // Read puzzle file
+    puzzleFile, err := os.Open(*puzzlePath)
     if err != nil {
         fmt.Println("Error reading puzzle file:", err)
         return
     }
+    defer puzzleFile.Close()
 
-    permutations := generateConcatenatedPermutations(lines, 4)
+    var lines []string
+    scanner := bufio.NewScanner(puzzleFile)
+    for scanner.Scan() {
+        line := strings.TrimSpace(scanner.Text())
+        if line != "" {
+            lines = append(lines, line)
+        }
+    }
+
+    if err := scanner.Err(); err != nil {
+        fmt.Println("Error reading puzzle file:", err)
+        return
+    }
+
+    // Generate permutations and check in trie
+    permutations := generatePermutations(lines, 4)
     checkInTrie(trie, permutations, *debug)
 }
