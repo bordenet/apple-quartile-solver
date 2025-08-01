@@ -34,28 +34,35 @@ go build -o applequartile
 
 ## Usage
 
+### Getting Help
+```bash
+./applequartile --help
+# or
+./applequartile -h
+```
+
 The application requires two command-line arguments:
 - `--dictionary`: Path to the WordNet `wn_s.pl` file
 - `--puzzle`: Path to your puzzle file containing the letter combinations
 
 ### Basic Usage
 ```bash
-./applequartile --dictionary ./prolog/wn_s.pl --puzzle ./puzzle1.txt
+./applequartile --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle1.txt
 ```
 
 ### Debug Mode
 To see detailed processing information:
 ```bash
-./applequartile --debug --dictionary ./prolog/wn_s.pl --puzzle ./puzzle2.txt
+./applequartile --debug --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle2.txt
 ```
 
 ### Complete Build and Run Examples
 ```bash
 # Example 1: Build and run with puzzle1.txt
-clear && go build -o applequartile && ./applequartile --dictionary ./prolog/wn_s.pl --puzzle ./puzzle1.txt
+clear && go build -o applequartile && ./applequartile --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle1.txt
 
 # Example 2: Build and run with debug output
-clear && go build -o applequartile && ./applequartile --debug --dictionary ./prolog/wn_s.pl --puzzle ./puzzle2.txt
+clear && go build -o applequartile && ./applequartile --debug --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle2.txt
 ```
 
 ## Testing

@@ -183,7 +183,35 @@ func main() {
 	debug := flag.Bool("debug", false, "Enable debug mode")
 	dictionaryPath := flag.String("dictionary", "", "Path to the dictionary file")
 	puzzlePath := flag.String("puzzle", "", "Path to the puzzle text file")
+	help := flag.Bool("help", false, "Show usage information")
 	flag.Parse()
+
+	if *help {
+		fmt.Println("Apple Quartile Solver 🧩🔤")
+		fmt.Println("A Go application that solves Apple News \"Quartile\" puzzles by finding valid English words from given letter combinations using WordNet dictionary data.")
+		fmt.Println()
+		fmt.Println("Usage:")
+		fmt.Printf("  %s [OPTIONS]\n", os.Args[0])
+		fmt.Println()
+		fmt.Println("Options:")
+		fmt.Println("  --dictionary PATH    Path to the WordNet dictionary file (wn_s.pl)")
+		fmt.Println("  --puzzle PATH        Path to the puzzle file containing letter combinations")
+		fmt.Println("  --debug             Enable debug mode for verbose output")
+		fmt.Println("  --help              Show this help message")
+		fmt.Println()
+		fmt.Println("Examples:")
+		fmt.Println("  # Basic usage")
+		fmt.Printf("  %s --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle1.txt\n", os.Args[0])
+		fmt.Println()
+		fmt.Println("  # With debug output")
+		fmt.Printf("  %s --debug --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle2.txt\n", os.Args[0])
+		fmt.Println()
+		fmt.Println("Setup:")
+		fmt.Println("  1. Download WordNet data: curl -O https://wordnetcode.princeton.edu/3.0/WNprolog-3.0.tar.gz")
+		fmt.Println("  2. Extract: tar -xvzf WNprolog-3.0.tar.gz")
+		fmt.Println("  3. Use the wn_s.pl file from the prolog/ directory")
+		return
+	}
 
 	startTime := time.Now()
 

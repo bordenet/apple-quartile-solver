@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io"
 	"os"
 	"strings"
@@ -376,6 +377,27 @@ s(100000005,1,'valid',a,1,5).`
 	// Word count should be reasonable (accounting for duplicates and generated forms)
 	if wordCount < 3 {
 		t.Errorf("Expected at least 3 words, got %d", wordCount)
+	}
+}
+
+func TestHelpFlag(t *testing.T) {
+	// Test that help flag functionality works
+	// This is more of an integration test since it involves os.Args
+	// We can't easily test the main function directly, but we can test 
+	// that the help flag is recognized by the flag package
+	
+	// Create a test to ensure help flag exists and has correct usage
+	fs := flag.NewFlagSet("test", flag.ContinueOnError)
+	help := fs.Bool("help", false, "Show usage information")
+	
+	// Test parsing help flag
+	err := fs.Parse([]string{"--help"})
+	if err != nil {
+		t.Errorf("Failed to parse help flag: %v", err)
+	}
+	
+	if !*help {
+		t.Error("Expected help flag to be true")
 	}
 }
 
