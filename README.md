@@ -58,14 +58,51 @@ clear && go build -o applequartile && ./applequartile --dictionary ./prolog/wn_s
 clear && go build -o applequartile && ./applequartile --debug --dictionary ./prolog/wn_s.pl --puzzle ./puzzle2.txt
 ```
 
+## Testing
+
+The project includes comprehensive unit tests, integration tests, and benchmarks.
+
+### Running Tests
+```bash
+# Run all tests
+go test -v
+
+# Run tests with coverage report
+go test -v -cover
+
+# Run only specific tests
+go test -v -run TestTrieNode
+
+# Run benchmark tests
+go test -bench=.
+
+# Run benchmarks with memory allocation stats
+go test -bench=. -benchmem
+```
+
+### Test Coverage
+The test suite covers:
+- **Trie operations**: Insert, search, and edge cases
+- **Dictionary loading**: File parsing, error handling, malformed data
+- **Word form generation**: Improved plural and verb conjugation rules
+- **Permutation generation**: All combinations and edge cases
+- **Input validation**: Missing files and error conditions
+- **Performance benchmarks**: Trie operations and permutation generation
+
 ## How It Works
 
 The solver:
 1. Loads the WordNet dictionary from `wn_s.pl` into a trie data structure
-2. Processes various word forms (plurals, past tense, present participles)
+2. Processes various word forms (plurals, past tense, present participles) with improved rules
 3. Reads your puzzle file containing letter combinations
 4. Generates all possible permutations of the letter combinations
 5. Validates each permutation against the dictionary
 6. Displays all valid English words found
+
+### Recent Improvements
+- Enhanced plural generation (handles -es, -ies endings)
+- Better verb conjugation rules (handles -e endings)
+- Input validation for missing files
+- Comprehensive test coverage
 
 ![image](https://github.com/user-attachments/assets/76c7617c-4eb6-4822-a9ea-f578a1cad161)

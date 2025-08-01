@@ -330,6 +330,55 @@ s(100000004,1,'run',v,1,3).`
 	}
 }
 
+func TestRegexParsing(t *testing.T) {
+	// Test potential edge cases in regex parsing
+	content := `s(100000001,1,'test',n,1,4).
+s(100000002,2,'test',v,1,4).
+s(100000003,1,'test-word',n,1,9).
+s(100000004,1,'test_word',n,1,9).
+invalid line without proper format
+s(100000005,1,'valid',a,1,5).`
+	
+	tmpfile, err := os.CreateTemp("", "test_regex*.pl")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(tmpfile.Name())
+	
+	if _, err := tmpfile.Write([]byte(content)); err != nil {
+		t.Fatal(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		t.Fatal(err)
+	}
+	
+	trie := NewTrieNode()
+	wordCount, err := loadDictionary(tmpfile.Name(), trie, false)
+	if err != nil {
+		t.Fatalf("loadDictionary failed: %v", err)
+	}
+	
+	// Should handle basic words
+	if !trie.Search("test") {
+		t.Error("Expected 'test' to be in trie")
+	}
+	
+	// Should handle words with hyphens and underscores
+	if !trie.Search("test-word") {
+		t.Error("Expected 'test-word' to be in trie")
+	}
+	
+	// Should handle adjectives (part of speech 'a')
+	if !trie.Search("valid") {
+		t.Error("Expected 'valid' to be in trie")
+	}
+	
+	// Word count should be reasonable (accounting for duplicates and generated forms)
+	if wordCount < 3 {
+		t.Errorf("Expected at least 3 words, got %d", wordCount)
+	}
+}
+
 func BenchmarkGeneratePermutations(b *testing.B) {
 	lines := []string{"a", "b", "c", "d"}
 	
