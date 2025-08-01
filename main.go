@@ -69,7 +69,8 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
 		}
 
 		// Use regex to extract the relevant parts from the input format
-		re := regexp.MustCompile(`s\(\d+,\d+,'([^']+)',([nvasr]),\d+,\d+\)\.`)
+		// More flexible pattern to handle variations in WordNet format
+		re := regexp.MustCompile(`s\(\d+,\d+,'([^']+)',([nvasr]),\d+,\d+\)\.?`)
 		matches := re.FindStringSubmatch(line)
 		if len(matches) == 3 {
 			word := strings.TrimSpace(matches[1])
