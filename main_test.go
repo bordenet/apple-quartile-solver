@@ -158,25 +158,32 @@ func TestGeneratePermutations(t *testing.T) {
 	if len(perms) != len(expected) {
 		t.Errorf("Expected %d permutations, got %d", len(expected), len(perms))
 	}
-	for i, perm := range perms {
-		if perm != expected[i] {
-			t.Errorf("Expected permutation %d to be '%s', got '%s'", i, expected[i], perm)
+	
+	// Check that all single letters are present
+	permSet := make(map[string]bool)
+	for _, perm := range perms {
+		permSet[perm] = true
+	}
+	for _, expected := range expected {
+		if !permSet[expected] {
+			t.Errorf("Expected permutation '%s' to be in results", expected)
 		}
 	}
 	
 	// Test with maxLines = 2
 	perms = generatePermutations(lines, 2)
-	expectedLen := 3 + 3 // 1-letter + 2-letter combinations
+	// Now we get: 3 single letters + 6 two-letter permutations (ab, ba, ac, ca, bc, cb)
+	expectedLen := 3 + 6
 	if len(perms) != expectedLen {
 		t.Errorf("Expected %d permutations, got %d", expectedLen, len(perms))
 	}
 	
-	// Check that "ab", "ac", "bc" are in the results
-	permSet := make(map[string]bool)
+	// Check that both "ab" and "ba" are in the results (all permutations)
+	permSet = make(map[string]bool)
 	for _, perm := range perms {
 		permSet[perm] = true
 	}
-	expectedTwoLetter := []string{"ab", "ac", "bc"}
+	expectedTwoLetter := []string{"ab", "ba", "ac", "ca", "bc", "cb"}
 	for _, expected := range expectedTwoLetter {
 		if !permSet[expected] {
 			t.Errorf("Expected permutation '%s' to be in results", expected)
@@ -189,6 +196,46 @@ func TestGeneratePermutations_EmptyInput(t *testing.T) {
 	perms := generatePermutations(lines, 1)
 	if len(perms) != 0 {
 		t.Errorf("Expected 0 permutations for empty input, got %d", len(perms))
+	}
+}
+
+func TestPermutations(t *testing.T) {
+	// Test single element
+	result := permutations([]string{"a"})
+	if len(result) != 1 || result[0][0] != "a" {
+		t.Errorf("Expected single permutation ['a'], got %v", result)
+	}
+	
+	// Test two elements
+	result = permutations([]string{"a", "b"})
+	if len(result) != 2 {
+		t.Errorf("Expected 2 permutations, got %d", len(result))
+	}
+	
+	// Convert to strings for easier comparison
+	resultStrs := make([]string, len(result))
+	for i, perm := range result {
+		resultStrs[i] = strings.Join(perm, "")
+	}
+	
+	expectedStrs := []string{"ab", "ba"}
+	for _, exp := range expectedStrs {
+		found := false
+		for _, res := range resultStrs {
+			if res == exp {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected permutation %s not found in results %v", exp, resultStrs)
+		}
+	}
+	
+	// Test three elements should give 3! = 6 permutations
+	result = permutations([]string{"a", "b", "c"})
+	if len(result) != 6 {
+		t.Errorf("Expected 6 permutations for 3 elements, got %d", len(result))
 	}
 }
 

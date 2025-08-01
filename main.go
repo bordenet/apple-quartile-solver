@@ -145,10 +145,42 @@ func generatePermutations(lines []string, maxLines int) []string {
 	for i := 1; i <= maxLines; i++ {
 		combinations := combinations(lines, i)
 		for _, combo := range combinations {
-			results = append(results, strings.Join(combo, ""))
+			// Generate all permutations of this combination
+			perms := permutations(combo)
+			for _, perm := range perms {
+				results = append(results, strings.Join(perm, ""))
+			}
 		}
 	}
 	return results
+}
+
+// Generate all permutations of a slice of strings
+func permutations(arr []string) [][]string {
+	var result [][]string
+	
+	if len(arr) == 0 {
+		return result
+	}
+	
+	if len(arr) == 1 {
+		return [][]string{arr}
+	}
+	
+	for i := 0; i < len(arr); i++ {
+		// Take current element
+		current := arr[i]
+		// Get remaining elements
+		remaining := append(append([]string{}, arr[:i]...), arr[i+1:]...)
+		// Get permutations of remaining elements
+		subPerms := permutations(remaining)
+		// Add current element to the front of each sub-permutation
+		for _, subPerm := range subPerms {
+			result = append(result, append([]string{current}, subPerm...))
+		}
+	}
+	
+	return result
 }
 
 func combinations(arr []string, r int) [][]string {
