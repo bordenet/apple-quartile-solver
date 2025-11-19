@@ -38,4 +38,3 @@ class TrieNode {
     return count;
   }
 }
-

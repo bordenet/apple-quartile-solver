@@ -17,10 +17,13 @@
 
 # Source common library
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
 init_script
 
-readonly REPO_ROOT="$(get_repo_root)"
+REPO_ROOT=""
+REPO_ROOT="$(get_repo_root)"
+readonly REPO_ROOT
 
 main() {
     log_header "Apple Quartile Solver - Go Setup"
@@ -33,7 +36,7 @@ main() {
     log_success "Go $go_version installed"
 
     log_section "Downloading Go dependencies"
-    cd "$REPO_ROOT"
+    cd "$REPO_ROOT" || die "Failed to change to repository root"
     go mod download
     log_success "Dependencies downloaded"
 

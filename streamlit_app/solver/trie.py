@@ -32,4 +32,3 @@ class TrieNode:
         for child in self.children.values():
             count += child.word_count()
         return count
-

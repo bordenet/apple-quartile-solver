@@ -41,4 +41,3 @@ class WordGenerator {
     return {'past': past, 'participle': participle};
   }
 }
-

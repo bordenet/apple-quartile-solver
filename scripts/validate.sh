@@ -19,10 +19,13 @@
 
 # Source common library
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
 init_script
 
-readonly REPO_ROOT="$(get_repo_root)"
+REPO_ROOT=""
+REPO_ROOT="$(get_repo_root)"
+readonly REPO_ROOT
 
 # Parse arguments
 FIX_MODE=false
@@ -35,8 +38,8 @@ FAILURES=0
 
 validate_go() {
     log_section "Validating Go code"
-    
-    cd "$REPO_ROOT"
+
+    cd "$REPO_ROOT" || die "Failed to change to repository root"
     
     # Check formatting
     log_info "Checking Go formatting..."
@@ -96,8 +99,8 @@ validate_flutter() {
     fi
     
     log_section "Validating Flutter web"
-    
-    cd "$REPO_ROOT/quartile_solver_web"
+
+    cd "$REPO_ROOT/quartile_solver_web" || die "Failed to change to Flutter directory"
     
     log_info "Running Flutter analyzer..."
     if flutter analyze; then
@@ -113,16 +116,17 @@ validate_python() {
     fi
     
     log_section "Validating Python code"
-    
-    cd "$REPO_ROOT/streamlit_app"
-    
+
+    cd "$REPO_ROOT/streamlit_app" || die "Failed to change to Streamlit directory"
+
     # Check if venv exists
     if [[ ! -d "venv" ]]; then
         log_warning "Python venv not found, skipping Python validation"
         log_info "Run: ./scripts/setup-web.sh --streamlit-only"
         return 0
     fi
-    
+
+    # shellcheck source=/dev/null
     source venv/bin/activate
     
     # Check if flake8 is available
@@ -138,8 +142,8 @@ validate_python() {
 
 check_binaries() {
     log_section "Checking for uncommitted binaries"
-    
-    cd "$REPO_ROOT"
+
+    cd "$REPO_ROOT" || die "Failed to change to repository root"
     
     # Check if applequartile binary is in git
     if git ls-files --error-unmatch applequartile &> /dev/null; then
