@@ -1,45 +1,122 @@
+################################################################################
+# SECURITY: Never commit credentials or secrets
+################################################################################
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+secrets.json
+*.pem
+*.key
+*.crt
+
+################################################################################
 # WordNet dictionary data
+################################################################################
 WNprolog-3.0.tar.gz
 prolog/
 
-# Binary
+################################################################################
+# Binaries (platform-specific, should be built from source)
+################################################################################
 applequartile
-
-# IDE
-.vscode/
-.idea/
-
-# OS
-.DS_Store
-
-# Python virtual environments
-streamlit_app/venv/
-**/venv/
-**/__pycache__/
-*.pyc
-
-# Flutter/Dart
-quartile_solver_web/.dart_tool/
-quartile_solver_web/.flutter-plugins
-quartile_solver_web/.flutter-plugins-dependencies
-quartile_solver_web/build/
-quartile_solver_web/pubspec.lock
-
-# Go
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+*.bin
+*.a
+*.o
+
+################################################################################
+# IDE and Editors
+################################################################################
+.vscode/
+.idea/
+*.swp
+*.swo
+*.bak
+*.orig
+
+################################################################################
+# OS
+################################################################################
+.DS_Store
+Thumbs.db
+
+################################################################################
+# Python
+################################################################################
+streamlit_app/venv/
+**/venv/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+################################################################################
+# Flutter/Dart
+################################################################################
+quartile_solver_web/.dart_tool/
+quartile_solver_web/.flutter-plugins
+quartile_solver_web/.flutter-plugins-dependencies
+quartile_solver_web/build/
+quartile_solver_web/pubspec.lock
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+
+################################################################################
+# Go
+################################################################################
 *.test
 *.out
 go.sum
+vendor/
+__debug_bin*
+bin/
+dist/
 
-# Test coverage
+################################################################################
+# Test Coverage
+################################################################################
+coverage/
 coverage.txt
 *.coverprofile
+*.lcov
+test-results/
+junit.xml
 
-# Temporary files
+################################################################################
+# Logs and Temporary Files
+################################################################################
+*.log
 *.tmp
 *.swp
 *~
+*.backup
+logs/
+temp/
+.cache/
+*.pid
+
+################################################################################
+# Build Artifacts
+################################################################################
+dist/
+builds/
+*.zip
+
+################################################################################
+# Validation Logs
+################################################################################
+.validation-logs/
