@@ -18,10 +18,13 @@
 
 # Source common library
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/common.sh
 source "$SCRIPT_DIR/lib/common.sh"
 init_script
 
-readonly REPO_ROOT="$(get_repo_root)"
+REPO_ROOT=""
+REPO_ROOT="$(get_repo_root)"
+readonly REPO_ROOT
 
 # Parse arguments
 SETUP_FLUTTER=true
@@ -53,8 +56,8 @@ setup_flutter() {
     local flutter_version
     flutter_version=$(flutter --version | head -1 | awk '{print $2}')
     log_success "Flutter $flutter_version installed"
-    
-    cd "$REPO_ROOT/quartile_solver_web"
+
+    cd "$REPO_ROOT/quartile_solver_web" || die "Failed to change to Flutter directory"
     
     log_info "Getting Flutter dependencies..."
     flutter pub get
@@ -74,16 +77,17 @@ setup_streamlit() {
     local python_version
     python_version=$(python3 --version | awk '{print $2}')
     log_success "Python $python_version installed"
-    
-    cd "$REPO_ROOT/streamlit_app"
-    
+
+    cd "$REPO_ROOT/streamlit_app" || die "Failed to change to Streamlit directory"
+
     if [[ ! -d "venv" ]]; then
         log_info "Creating Python virtual environment..."
         python3 -m venv venv
         log_success "Virtual environment created"
     fi
-    
+
     log_info "Installing Streamlit dependencies..."
+    # shellcheck source=/dev/null
     source venv/bin/activate
     pip install -q --upgrade pip
     pip install -q -r requirements.txt

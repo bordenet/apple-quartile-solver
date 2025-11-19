@@ -37,13 +37,15 @@ class PuzzleInput extends StatelessWidget {
                 fontSize: 14,
               ),
               decoration: InputDecoration(
-                hintText: 'Enter puzzle tiles (one per line)\nExample:\ndis\ncre\nti\non',
+                hintText:
+                    'Enter puzzle tiles (one per line)\nExample:\ndis\ncre\nti\non',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Color(0xFF007AFF), width: 2),
+                  borderSide:
+                      const BorderSide(color: Color(0xFF007AFF), width: 2),
                 ),
                 filled: true,
                 fillColor: Colors.white,
@@ -62,7 +64,8 @@ class PuzzleInput extends StatelessWidget {
                 return OutlinedButton(
                   onPressed: () => appState.loadSample(index + 1),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                   ),
                   child: Text('Puzzle ${index + 1}'),
                 );
@@ -73,9 +76,10 @@ class PuzzleInput extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: appState.isProcessing || appState.currentInput.isEmpty
-                        ? null
-                        : appState.solvePuzzle,
+                    onPressed:
+                        appState.isProcessing || appState.currentInput.isEmpty
+                            ? null
+                            : appState.solvePuzzle,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF007AFF),
                       foregroundColor: Colors.white,
@@ -90,12 +94,14 @@ class PuzzleInput extends StatelessWidget {
                             width: 20,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
                         : const Text(
                             'Solve Puzzle',
-                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                   ),
                 ),
@@ -103,7 +109,8 @@ class PuzzleInput extends StatelessWidget {
                 OutlinedButton(
                   onPressed: appState.clearPuzzle,
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 16, horizontal: 24),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -117,7 +124,7 @@ class PuzzleInput extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFF3B30).withOpacity(0.1),
+                  color: const Color(0xFFFF3B30).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: const Color(0xFFFF3B30)),
                 ),
@@ -133,4 +140,3 @@ class PuzzleInput extends StatelessWidget {
     );
   }
 }
-

@@ -94,7 +94,8 @@ class ResultsPanel extends StatelessWidget {
                 children: [
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => _copyResults(context, appState.sortedWords),
+                      onPressed: () =>
+                          _copyResults(context, appState.sortedWords),
                       icon: const Icon(Icons.copy, size: 18),
                       label: const Text('Copy'),
                     ),
@@ -102,7 +103,8 @@ class ResultsPanel extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => _exportResults(context, appState.sortedWords),
+                      onPressed: () =>
+                          _exportResults(context, appState.sortedWords),
                       icon: const Icon(Icons.download, size: 18),
                       label: const Text('Export'),
                     ),
@@ -122,7 +124,9 @@ class ResultsPanel extends StatelessWidget {
                       final word = appState.sortedWords[index];
                       return Container(
                         decoration: BoxDecoration(
-                          color: index.isEven ? Colors.white : const Color(0xFFFAFAFA),
+                          color: index.isEven
+                              ? Colors.white
+                              : const Color(0xFFFAFAFA),
                           border: index < appState.sortedWords.length - 1
                               ? const Border(
                                   bottom: BorderSide(color: Color(0xFFE5E5EA)),
@@ -149,7 +153,8 @@ class ResultsPanel extends StatelessWidget {
   }
 
   void _copyResults(BuildContext context, List<String> words) {
-    final text = words.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n');
+    final text =
+        words.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n');
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Results copied to clipboard')),
@@ -157,11 +162,11 @@ class ResultsPanel extends StatelessWidget {
   }
 
   void _exportResults(BuildContext context, List<String> words) {
-    final text = words.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n');
+    final text =
+        words.asMap().entries.map((e) => '${e.key + 1}. ${e.value}').join('\n');
     Clipboard.setData(ClipboardData(text: text));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Results exported to clipboard')),
     );
   }
 }
-

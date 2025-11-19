@@ -51,4 +51,3 @@ class SolverResult {
     return words.reduce((a, b) => a.length < b.length ? a : b);
   }
 }
-

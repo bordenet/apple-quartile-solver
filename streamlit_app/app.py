@@ -1,4 +1,5 @@
 """Apple Quartile Solver - Streamlit Web Interface"""
+
 import streamlit as st
 import time
 from pathlib import Path
@@ -13,7 +14,8 @@ st.set_page_config(
 )
 
 # Custom CSS
-st.markdown("""
+st.markdown(
+    """
 <style>
     .main {
         background-color: #F2F2F7;
@@ -43,15 +45,32 @@ st.markdown("""
         margin: 8px 0;
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # Sample puzzles
 SAMPLE_PUZZLES = {
-    "Puzzle 1": "dis\ncre\nti\non\nuns\ncra\nmb\nles\norn\nit\nhol\nogy\npro\nve\nrb\nial\nga\nte\nkee\nping",
-    "Puzzle 2": "per\niwi\nnk\nle\nju\ndgm\nent\nal\ntoa\nst\nmas\nter\nsy\nmpa\nthi\nzed\nspli\nnt\neri\nng",
-    "Puzzle 3": "ma\npur\ncha\nbib\nwi\nrshm\npor\nnn\nlio\nse\nall\nted\neli\nph\ncra\now\nly\nng\nile\ncked",
-    "Puzzle 4": "hyd\ngra\nal\nsc\nhori\nran\nss\nto\nand\nzo\nge\nroo\nget\nali\nnta\nas\nts\nher\nzed\nlly",
-    "Puzzle 5": "et\nci\nway\nve\nma\nent\nsa\nrcum\ning\nnts\nomp\nmes\npas\nriz\nme\nce\ninc\npea\nge\nker",
+    "Puzzle 1": (
+        "dis\ncre\nti\non\nuns\ncra\nmb\nles\norn\nit\nhol\nogy\n"
+        "pro\nve\nrb\nial\nga\nte\nkee\nping"
+    ),
+    "Puzzle 2": (
+        "per\niwi\nnk\nle\nju\ndgm\nent\nal\ntoa\nst\nmas\nter\n"
+        "sy\nmpa\nthi\nzed\nspli\nnt\neri\nng"
+    ),
+    "Puzzle 3": (
+        "ma\npur\ncha\nbib\nwi\nrshm\npor\nnn\nlio\nse\nall\nted\n"
+        "eli\nph\ncra\now\nly\nng\nile\ncked"
+    ),
+    "Puzzle 4": (
+        "hyd\ngra\nal\nsc\nhori\nran\nss\nto\nand\nzo\nge\nroo\n"
+        "get\nali\nnta\nas\nts\nher\nzed\nlly"
+    ),
+    "Puzzle 5": (
+        "et\nci\nway\nve\nma\nent\nsa\nrcum\ning\nnts\nomp\nmes\n"
+        "pas\nriz\nme\nce\ninc\npea\nge\nker"
+    ),
 }
 
 
@@ -59,38 +78,38 @@ SAMPLE_PUZZLES = {
 def initialize_dictionary():
     """Load dictionary once and cache it"""
     dictionary_path = Path(__file__).parent.parent / "prolog" / "wn_s.pl"
-    
+
     if not dictionary_path.exists():
         st.error(f"Dictionary file not found: {dictionary_path}")
         st.stop()
-    
+
     with st.spinner("Loading dictionary..."):
         trie, word_count = load_dictionary(str(dictionary_path))
-    
+
     return trie, word_count
 
 
 def main():
     # Initialize dictionary
     trie, dict_word_count = initialize_dictionary()
-    
+
     # Header
     st.title("🔤 Apple Quartile Solver")
     st.caption(f"Dictionary loaded: {dict_word_count:,} words")
-    
+
     # Layout
     col1, col2 = st.columns([4, 6])
-    
+
     with col1:
         st.subheader("Puzzle Input")
-        
+
         # Sample puzzle selector
         sample_choice = st.selectbox(
             "Load Sample Puzzle",
             [""] + list(SAMPLE_PUZZLES.keys()),
             index=0,
         )
-        
+
         # Puzzle input
         default_text = SAMPLE_PUZZLES.get(sample_choice, "")
         puzzle_input = st.text_area(
@@ -100,25 +119,25 @@ def main():
             placeholder="Example:\ndis\ncre\nti\non",
             help="Enter each puzzle tile on a separate line",
         )
-        
+
         # Action buttons
         col_solve, col_clear = st.columns([3, 1])
-        
+
         with col_solve:
             solve_button = st.button("🎯 Solve Puzzle", use_container_width=True)
-        
+
         with col_clear:
             if st.button("Clear", use_container_width=True):
                 st.rerun()
-    
+
     with col2:
         st.subheader("Results")
-        
+
         if solve_button:
             # Parse and validate input
             tiles = parse_puzzle_input(puzzle_input)
             is_valid, error_msg = validate_puzzle(tiles)
-            
+
             if not is_valid:
                 st.error(f"❌ {error_msg}")
             else:
@@ -126,24 +145,28 @@ def main():
                 start_time = time.time()
                 words, perms_checked = solve_puzzle(tiles, trie)
                 elapsed_time = time.time() - start_time
-                
+
                 # Display results
                 if words:
                     # Statistics
-                    st.markdown(f"""
+                    st.markdown(
+                        f"""
                     <div class="stat-box">
                         <strong>{len(words)} words found</strong><br>
-                        <small>Processed in {elapsed_time*1000:.0f}ms • {perms_checked:,} permutations checked</small>
+                        <small>Processed in {elapsed_time*1000:.0f}ms • """
+                        f"""{perms_checked:,} permutations checked</small>
                     </div>
-                    """, unsafe_allow_html=True)
-                    
+                    """,
+                        unsafe_allow_html=True,
+                    )
+
                     # Sort options
                     sort_option = st.radio(
                         "Sort by",
                         ["Original", "Alphabetical", "Length (longest first)"],
                         horizontal=True,
                     )
-                    
+
                     # Sort words
                     if sort_option == "Alphabetical":
                         display_words = sorted(words)
@@ -151,7 +174,7 @@ def main():
                         display_words = sorted(words, key=lambda w: (-len(w), w))
                     else:
                         display_words = words
-                    
+
                     # Export buttons
                     col_copy, col_export = st.columns(2)
                     with col_copy:
@@ -162,22 +185,22 @@ def main():
                             file_name="quartile_results.txt",
                             use_container_width=True,
                         )
-                    
+
                     # Display words
                     st.markdown("---")
-                    
+
                     # Create scrollable list
                     words_html = "<div style='max-height: 500px; overflow-y: auto;'>"
                     for i, word in enumerate(display_words):
                         bg_color = "#FFFFFF" if i % 2 == 0 else "#FAFAFA"
                         words_html += f"""
-                        <div style='background-color: {bg_color}; padding: 8px 16px; 
+                        <div style='background-color: {bg_color}; padding: 8px 16px;
                                     border-bottom: 1px solid #E5E5EA;'>
                             {i+1}. {word}
                         </div>
                         """
                     words_html += "</div>"
-                    
+
                     st.markdown(words_html, unsafe_allow_html=True)
                 else:
                     st.warning("No words found for this puzzle.")
@@ -187,4 +210,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

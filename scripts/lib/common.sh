@@ -13,9 +13,9 @@ readonly COLOR_GREEN='\033[0;32m'
 readonly COLOR_YELLOW='\033[1;33m'
 readonly COLOR_BLUE='\033[0;34m'
 readonly COLOR_CYAN='\033[0;36m'
-readonly COLOR_MAGENTA='\033[0;35m'
+readonly COLOR_MAGENTA='\033[0;35m'  # Used in some scripts
 readonly COLOR_BOLD='\033[1m'
-readonly COLOR_DIM='\033[2m'
+readonly COLOR_DIM='\033[2m'  # Used in some scripts
 readonly COLOR_RESET='\033[0m'
 
 # Status prefixes
@@ -200,7 +200,7 @@ ask_yes_no() {
 show_spinner() {
     local pid=$1
     local delay=0.1
-    local spinstr='|/-\'
+    local spinstr='|/-\\'
 
     while kill -0 "$pid" 2>/dev/null; do
         local temp=${spinstr#?}

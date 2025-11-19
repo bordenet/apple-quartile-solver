@@ -36,7 +36,6 @@ class AppState extends ChangeNotifier {
       case SortOrder.byLength:
         return _currentResult!.sortedByLength();
       case SortOrder.original:
-      default:
         return _currentResult!.words;
     }
   }
@@ -124,4 +123,3 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 }
-

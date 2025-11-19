@@ -27,4 +27,3 @@ class Puzzle {
 
   String toText() => tiles.join('\n');
 }
-
