@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-// ANSI color codes
+// ANSI color codes for terminal output
 const (
 	Reset = "\033[0m"
 	Gray  = "\033[90m"
@@ -18,11 +18,13 @@ const (
 	Red   = "\033[31m"
 )
 
+// TrieNode represents a node in the trie data structure for efficient word lookup.
 type TrieNode struct {
 	Children map[rune]*TrieNode
 	IsEnd    bool
 }
 
+// NewTrieNode creates and initializes a new trie node.
 func NewTrieNode() *TrieNode {
 	return &TrieNode{
 		Children: make(map[rune]*TrieNode),
@@ -30,6 +32,7 @@ func NewTrieNode() *TrieNode {
 	}
 }
 
+// Insert adds a word to the trie.
 func (t *TrieNode) Insert(word string) {
 	node := t
 	for _, char := range word {
@@ -41,6 +44,7 @@ func (t *TrieNode) Insert(word string) {
 	node.IsEnd = true
 }
 
+// Search returns true if the word exists in the trie.
 func (t *TrieNode) Search(word string) bool {
 	node := t
 	for _, char := range word {
@@ -52,6 +56,42 @@ func (t *TrieNode) Search(word string) bool {
 	return node.IsEnd
 }
 
+// generatePlural generates the plural form of a noun using basic English rules.
+func generatePlural(word string) string {
+	if strings.HasSuffix(word, "s") || strings.HasSuffix(word, "sh") ||
+		strings.HasSuffix(word, "ch") || strings.HasSuffix(word, "x") ||
+		strings.HasSuffix(word, "z") {
+		return word + "es"
+	}
+	if strings.HasSuffix(word, "y") && len(word) > 1 &&
+		!strings.Contains("aeiou", string(word[len(word)-2])) {
+		return word[:len(word)-1] + "ies"
+	}
+	return word + "s"
+}
+
+// generateVerbForms generates past tense and present participle forms of a verb.
+func generateVerbForms(word string) (past, participle string) {
+	// Past tense
+	if strings.HasSuffix(word, "e") {
+		past = word + "d"
+	} else {
+		past = word + "ed"
+	}
+
+	// Present participle
+	if strings.HasSuffix(word, "e") && len(word) > 1 {
+		participle = word[:len(word)-1] + "ing"
+	} else {
+		participle = word + "ing"
+	}
+
+	return past, participle
+}
+
+// loadDictionary loads words from a WordNet Prolog file into the trie.
+// It parses the WordNet synset format and generates common word forms.
+// Returns the number of words loaded and any error encountered.
 func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, error) {
 	dictionaryFile, err := os.Open(dictionaryPath)
 	if err != nil {
@@ -62,73 +102,50 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
 	scanner := bufio.NewScanner(dictionaryFile)
 	wordCount := 0
 
+	// WordNet format: s(synset_id,w_num,'word',pos,sense_num,tag_count).
+	re := regexp.MustCompile(`s\(\d+,\d+,'([^']+)',([nvasr]),\d+,\d+\)\.?`)
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if debug {
 			fmt.Printf(Gray+"Reading line: %s"+Reset+"\n", line)
 		}
 
-		// Use regex to extract the relevant parts from the input format
-		// More flexible pattern to handle variations in WordNet format
-		re := regexp.MustCompile(`s\(\d+,\d+,'([^']+)',([nvasr]),\d+,\d+\)\.?`)
 		matches := re.FindStringSubmatch(line)
-		if len(matches) == 3 {
-			word := strings.TrimSpace(matches[1])
-			partOfSpeech := matches[2]
-
-			word = strings.ToLower(word)
-
-			// Skip originally capitalized words (check original before lowercase conversion)
-			if len(matches[1]) > 0 && matches[1][0] >= 'A' && matches[1][0] <= 'Z' {
-				continue
-			}
-
-			// Insert the original word into the trie
-			trie.Insert(word)
-			wordCount++
-
-			// Handle plural nouns with basic rules
-			if partOfSpeech == "n" {
-				plural := word
-				if strings.HasSuffix(word, "s") || strings.HasSuffix(word, "sh") || strings.HasSuffix(word, "ch") || strings.HasSuffix(word, "x") || strings.HasSuffix(word, "z") {
-					plural = word + "es"
-				} else if strings.HasSuffix(word, "y") && len(word) > 1 && !strings.Contains("aeiou", string(word[len(word)-2])) {
-					plural = word[:len(word)-1] + "ies"
-				} else {
-					plural = word + "s"
-				}
-				trie.Insert(plural)
-				wordCount++
-			}
-
-			// Handle verb forms (basic conjugation)
-			if partOfSpeech == "v" {
-				// Add common verb forms with basic rules
-				past := word
-				presentParticiple := word
-
-				// Simple past tense rules
-				if strings.HasSuffix(word, "e") {
-					past = word + "d"
-				} else {
-					past = word + "ed"
-				}
-
-				// Simple present participle rules
-				if strings.HasSuffix(word, "e") && len(word) > 1 {
-					presentParticiple = word[:len(word)-1] + "ing"
-				} else {
-					presentParticiple = word + "ing"
-				}
-
-				trie.Insert(past)
-				trie.Insert(presentParticiple)
-				wordCount += 2
-			}
-		} else {
+		if len(matches) != 3 {
 			if debug {
 				fmt.Printf(Gray+"Failed to parse line: %s"+Reset+"\n", line)
 			}
+			continue
+		}
+
+		word := strings.TrimSpace(matches[1])
+		partOfSpeech := matches[2]
+
+		// Skip capitalized words (proper nouns)
+		if len(word) > 0 && word[0] >= 'A' && word[0] <= 'Z' {
+			continue
+		}
+
+		word = strings.ToLower(word)
+
+		// Insert the base word
+		trie.Insert(word)
+		wordCount++
+
+		// Generate and insert plural forms for nouns
+		if partOfSpeech == "n" {
+			plural := generatePlural(word)
+			trie.Insert(plural)
+			wordCount++
+		}
+
+		// Generate and insert verb forms
+		if partOfSpeech == "v" {
+			past, participle := generateVerbForms(word)
+			trie.Insert(past)
+			trie.Insert(participle)
+			wordCount += 2
 		}
 	}
 
@@ -139,13 +156,15 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
 	return wordCount, nil
 }
 
+// generatePermutations generates all possible word combinations from puzzle tiles.
+// It creates combinations of 1 to maxLines tiles, then generates all permutations
+// of each combination.
 func generatePermutations(lines []string, maxLines int) []string {
 	var results []string
 
 	for i := 1; i <= maxLines; i++ {
 		combinations := combinations(lines, i)
 		for _, combo := range combinations {
-			// Generate all permutations of this combination
 			perms := permutations(combo)
 			for _, perm := range perms {
 				results = append(results, strings.Join(perm, ""))
@@ -155,34 +174,31 @@ func generatePermutations(lines []string, maxLines int) []string {
 	return results
 }
 
-// Generate all permutations of a slice of strings
+// permutations generates all permutations of a slice of strings.
 func permutations(arr []string) [][]string {
 	var result [][]string
-	
+
 	if len(arr) == 0 {
 		return result
 	}
-	
+
 	if len(arr) == 1 {
 		return [][]string{arr}
 	}
-	
+
 	for i := 0; i < len(arr); i++ {
-		// Take current element
 		current := arr[i]
-		// Get remaining elements
 		remaining := append(append([]string{}, arr[:i]...), arr[i+1:]...)
-		// Get permutations of remaining elements
 		subPerms := permutations(remaining)
-		// Add current element to the front of each sub-permutation
 		for _, subPerm := range subPerms {
 			result = append(result, append([]string{current}, subPerm...))
 		}
 	}
-	
+
 	return result
 }
 
+// combinations generates all combinations of r elements from arr.
 func combinations(arr []string, r int) [][]string {
 	var result [][]string
 	var f func([]string, int, []string)
@@ -199,16 +215,40 @@ func combinations(arr []string, r int) [][]string {
 	return result
 }
 
+// checkInTrie validates permutations against the dictionary and prints valid words.
 func checkInTrie(trie *TrieNode, permutations []string, debug bool) {
-	var i int = 0
+	count := 0
 	for _, perm := range permutations {
 		if trie.Search(perm) {
-			i++
-			fmt.Printf(Gray+"%2d. "+Green+"%s"+Reset+"\n", i, perm)
+			count++
+			fmt.Printf(Gray+"%2d. "+Green+"%s"+Reset+"\n", count, perm)
 		} else if debug {
 			fmt.Printf(Red+"Not found in trie: %s"+Reset+"\n", perm)
 		}
 	}
+}
+
+// printHelp displays usage information.
+func printHelp() {
+	fmt.Println("Apple Quartile Solver")
+	fmt.Println("Solves Apple News Quartile puzzles using WordNet dictionary.")
+	fmt.Println()
+	fmt.Println("Usage:")
+	fmt.Printf("  %s [OPTIONS]\n", os.Args[0])
+	fmt.Println()
+	fmt.Println("Options:")
+	fmt.Println("  --dictionary PATH    Path to WordNet dictionary file (wn_s.pl)")
+	fmt.Println("  --puzzle PATH        Path to puzzle file with letter combinations")
+	fmt.Println("  --debug              Enable debug mode for verbose output")
+	fmt.Println("  --help               Show this help message")
+	fmt.Println()
+	fmt.Println("Examples:")
+	fmt.Printf("  %s --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle1.txt\n", os.Args[0])
+	fmt.Printf("  %s --debug --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle2.txt\n", os.Args[0])
+	fmt.Println()
+	fmt.Println("Setup:")
+	fmt.Println("  curl -O https://wordnetcode.princeton.edu/3.0/WNprolog-3.0.tar.gz")
+	fmt.Println("  tar -xzf WNprolog-3.0.tar.gz")
 }
 
 func main() {
@@ -219,88 +259,73 @@ func main() {
 	flag.Parse()
 
 	if *help {
-		fmt.Println("Apple Quartile Solver 🧩🔤")
-		fmt.Println("A Go application that solves Apple News \"Quartile\" puzzles by finding valid English words from given letter combinations using WordNet dictionary data.")
-		fmt.Println()
-		fmt.Println("Usage:")
-		fmt.Printf("  %s [OPTIONS]\n", os.Args[0])
-		fmt.Println()
-		fmt.Println("Options:")
-		fmt.Println("  --dictionary PATH    Path to the WordNet dictionary file (wn_s.pl)")
-		fmt.Println("  --puzzle PATH        Path to the puzzle file containing letter combinations")
-		fmt.Println("  --debug             Enable debug mode for verbose output")
-		fmt.Println("  --help              Show this help message")
-		fmt.Println()
-		fmt.Println("Examples:")
-		fmt.Println("  # Basic usage")
-		fmt.Printf("  %s --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle1.txt\n", os.Args[0])
-		fmt.Println()
-		fmt.Println("  # With debug output")
-		fmt.Printf("  %s --debug --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle2.txt\n", os.Args[0])
-		fmt.Println()
-		fmt.Println("Setup:")
-		fmt.Println("  1. Download WordNet data: curl -O https://wordnetcode.princeton.edu/3.0/WNprolog-3.0.tar.gz")
-		fmt.Println("  2. Extract: tar -xvzf WNprolog-3.0.tar.gz")
-		fmt.Println("  3. Use the wn_s.pl file from the prolog/ directory")
+		printHelp()
 		return
+	}
+
+	if *dictionaryPath == "" || *puzzlePath == "" {
+		fmt.Println("Error: Both --dictionary and --puzzle are required")
+		fmt.Println("Run with --help for usage information")
+		os.Exit(1)
+	}
+
+	// Validate input files exist
+	if _, err := os.Stat(*dictionaryPath); os.IsNotExist(err) {
+		fmt.Printf("Error: Dictionary file not found: %s\n", *dictionaryPath)
+		os.Exit(1)
+	}
+
+	if _, err := os.Stat(*puzzlePath); os.IsNotExist(err) {
+		fmt.Printf("Error: Puzzle file not found: %s\n", *puzzlePath)
+		os.Exit(1)
 	}
 
 	startTime := time.Now()
 
-	if *dictionaryPath == "" || *puzzlePath == "" {
-		fmt.Println("Usage: applequartile [--debug] --dictionary <path> --puzzle <path>")
-		return
+	if !*debug {
+		fmt.Println("Loading dictionary from:", *dictionaryPath)
 	}
-
-	// Validate input files exist and are readable
-	if _, err := os.Stat(*dictionaryPath); os.IsNotExist(err) {
-		fmt.Printf("Error: Dictionary file does not exist: %s\n", *dictionaryPath)
-		return
-	}
-
-	if _, err := os.Stat(*puzzlePath); os.IsNotExist(err) {
-		fmt.Printf("Error: Puzzle file does not exist: %s\n", *puzzlePath)
-		return
-	}
-
-	fmt.Println("Loading dictionary from:", *dictionaryPath)
 
 	trie := NewTrieNode()
 	wordCount, err := loadDictionary(*dictionaryPath, trie, *debug)
 	if err != nil {
-		fmt.Println("Error loading dictionary:", err)
-		return
+		fmt.Printf("Error loading dictionary: %v\n", err)
+		os.Exit(1)
 	}
 
-	loadDuration := time.Since(startTime)
 	if *debug {
-		fmt.Printf("Parsed words into trie: %d\n", wordCount)
-		fmt.Printf("Loaded words into the trie in %v\n", loadDuration)
+		loadDuration := time.Since(startTime)
+		fmt.Printf("Loaded %d words into trie in %v\n", wordCount, loadDuration)
 	}
 
 	// Read puzzle file
 	puzzleFile, err := os.Open(*puzzlePath)
 	if err != nil {
-		fmt.Println("Error reading puzzle file:", err)
-		return
+		fmt.Printf("Error opening puzzle file: %v\n", err)
+		os.Exit(1)
 	}
 	defer puzzleFile.Close()
 
-	var lines []string
+	var tiles []string
 	scanner := bufio.NewScanner(puzzleFile)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if line != "" {
-			lines = append(lines, line)
+			tiles = append(tiles, line)
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Error reading puzzle file:", err)
-		return
+		fmt.Printf("Error reading puzzle file: %v\n", err)
+		os.Exit(1)
 	}
 
-	// Generate permutations and check in trie
-	permutations := generatePermutations(lines, 4)
+	if len(tiles) == 0 {
+		fmt.Println("Error: Puzzle file is empty")
+		os.Exit(1)
+	}
+
+	// Generate all permutations and validate against dictionary
+	permutations := generatePermutations(tiles, 4)
 	checkInTrie(trie, permutations, *debug)
 }

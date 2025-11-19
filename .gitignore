@@ -1,2 +1,13 @@
+# WordNet dictionary data
 WNprolog-3.0.tar.gz
-prolog
+prolog/
+
+# Binary
+applequartile
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
