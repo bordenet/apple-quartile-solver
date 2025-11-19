@@ -8,7 +8,20 @@ Solves Apple News Quartile puzzles by finding valid English words from letter co
 
 ## Quick Start
 
-### Command-Line Interface
+### Automated Setup (Recommended)
+
+```bash
+# Setup Go environment and build
+./scripts/setup-go.sh
+
+# Setup web UIs (optional)
+./scripts/setup-web.sh
+
+# Install git hooks for code quality
+./scripts/install-hooks.sh
+```
+
+### Manual Setup - Command-Line Interface
 
 ```bash
 # Download dictionary
@@ -90,10 +103,18 @@ go build -o applequartile
 ./applequartile --debug --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle2.txt
 ```
 
-## Testing
+## Development
+
+### Validation & Testing
 
 ```bash
-# Run all tests
+# Run all validation checks (formatting, linting, tests)
+./scripts/validate.sh
+
+# Auto-fix formatting issues
+./scripts/validate.sh --fix
+
+# Run tests only
 go test -v
 
 # With coverage
@@ -110,6 +131,18 @@ Test coverage includes:
 - Permutation generation
 - Input validation
 - Performance benchmarks
+
+### Pre-Commit Hooks
+
+Git hooks automatically validate code before commits:
+
+```bash
+# Install hooks (one-time setup)
+./scripts/install-hooks.sh
+
+# Hooks will run automatically on 'git commit'
+# To bypass (not recommended): git commit --no-verify
+```
 
 ## How It Works
 
@@ -134,11 +167,22 @@ apple-quartile-solver/
 ├── main.go                 # CLI implementation (330 lines)
 ├── main_test.go            # Tests (507 lines)
 ├── samples/                # Sample puzzles
+├── scripts/                # Automation scripts
+│   ├── lib/common.sh      # Shared shell library
+│   ├── setup-go.sh        # Go environment setup
+│   ├── setup-web.sh       # Web UI setup
+│   ├── validate.sh        # Code validation
+│   └── install-hooks.sh   # Git hooks installer
 ├── streamlit_app/          # Streamlit web UI
 │   ├── app.py             # Main app (190 lines)
 │   └── solver/            # Solver package (186 lines)
 ├── quartile_solver_web/   # Flutter web UI
 │   └── lib/               # Modular architecture (903 lines)
+├── starter-kit/            # Engineering best practices
+│   ├── README.md          # Starter kit overview
+│   ├── SAFETY_NET.md      # Safety mechanisms guide
+│   ├── SHELL_SCRIPT_STANDARDS.md
+│   └── common.sh          # Shell script library
 └── docs/                  # Design documentation
     ├── PRD.md
     ├── DESIGN_SPEC.md
@@ -150,8 +194,19 @@ All code files are under 400 lines for maintainability.
 
 ## Documentation
 
+### User Documentation
 - **[WEB_UI_README.md](WEB_UI_README.md)** - Web interface overview and quick start
 - **[docs/PRD.md](docs/PRD.md)** - Product requirements document
 - **[docs/DESIGN_SPEC.md](docs/DESIGN_SPEC.md)** - Technical design specification
 - **[docs/VISUAL_DESIGN.md](docs/VISUAL_DESIGN.md)** - Visual design system
 - **[docs/WEB_UI_GUIDE.md](docs/WEB_UI_GUIDE.md)** - Detailed implementation guide
+
+### Engineering Documentation
+- **[starter-kit/README.md](starter-kit/README.md)** - Engineering best practices overview
+- **[starter-kit/SAFETY_NET.md](starter-kit/SAFETY_NET.md)** - Automated safety mechanisms
+- **[starter-kit/SHELL_SCRIPT_STANDARDS.md](starter-kit/SHELL_SCRIPT_STANDARDS.md)** - Shell scripting conventions
+- **[starter-kit/DEVELOPMENT_PROTOCOLS.md](starter-kit/DEVELOPMENT_PROTOCOLS.md)** - Development workflows
+
+## License
+
+MIT License - See [LICENSE](LICENSE) file for details.

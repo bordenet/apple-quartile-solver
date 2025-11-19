@@ -24,3 +24,22 @@ quartile_solver_web/.flutter-plugins
 quartile_solver_web/.flutter-plugins-dependencies
 quartile_solver_web/build/
 quartile_solver_web/pubspec.lock
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.sum
+
+# Test coverage
+coverage.txt
+*.coverprofile
+
+# Temporary files
+*.tmp
+*.swp
+*~
