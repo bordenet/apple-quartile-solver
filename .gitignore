@@ -11,3 +11,16 @@ applequartile
 
 # OS
 .DS_Store
+
+# Python virtual environments
+streamlit_app/venv/
+**/venv/
+**/__pycache__/
+*.pyc
+
+# Flutter/Dart
+quartile_solver_web/.dart_tool/
+quartile_solver_web/.flutter-plugins
+quartile_solver_web/.flutter-plugins-dependencies
+quartile_solver_web/build/
+quartile_solver_web/pubspec.lock
