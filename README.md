@@ -1,10 +1,34 @@
 # Apple Quartile Solver
 
+[![CI](https://github.com/bordenet/apple-quartile-solver/workflows/CI/badge.svg)](https://github.com/bordenet/apple-quartile-solver/actions)
+[![codecov](https://codecov.io/gh/bordenet/apple-quartile-solver/branch/main/graph/badge.svg)](https://codecov.io/gh/bordenet/apple-quartile-solver)
+[![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://go.dev/)
+[![Python Version](https://img.shields.io/badge/Python-3.8+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Flutter Version](https://img.shields.io/badge/Flutter-3.0+-02569B?logo=flutter)](https://flutter.dev/)
+[![License](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)](LICENSE)
+
 Solves Apple News Quartile puzzles by finding valid English words from letter combinations using the WordNet dictionary.
 
-**Available Interfaces:**
-- **Command-line** (Go) - Fast, efficient CLI tool
-- **Web UI** (Flutter/Streamlit) - Interactive browser-based interfaces
+## Features
+
+- **Multiple Interfaces**: Command-line (Go), Web UI (Flutter), and Streamlit (Python)
+- **Fast Performance**: Solves 20-tile puzzles in under 1 second
+- **Comprehensive Dictionary**: WordNet 3.0 with 117k+ base words
+- **Automated Testing**: 70%+ code coverage with unit and E2E tests
+- **CI/CD Pipeline**: Automated testing and validation on every commit
+
+## Table of Contents
+
+- [Quick Start](#quick-start)
+- [Prerequisites](#prerequisites)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Development](#development)
+- [Testing](#testing)
+- [Project Structure](#project-structure)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Quick Start
 
@@ -120,17 +144,12 @@ go test -v
 # With coverage
 go test -v -cover
 
+# Run E2E tests
+./test_e2e.sh
+
 # Benchmarks
 go test -bench=. -benchmem
 ```
-
-Test coverage includes:
-- Trie operations (insert, search, edge cases)
-- Dictionary loading (parsing, error handling, malformed data)
-- Word form generation (plurals, verb conjugation)
-- Permutation generation
-- Input validation
-- Performance benchmarks
 
 ### Pre-Commit Hooks
 
@@ -143,6 +162,54 @@ Git hooks automatically validate code before commits:
 # Hooks will run automatically on 'git commit'
 # To bypass (not recommended): git commit --no-verify
 ```
+
+## Testing
+
+### Test Coverage
+
+Current test coverage: **70%+** (unit tests) + comprehensive E2E tests
+
+**Unit Tests:**
+
+- Trie operations (insert, search, edge cases)
+- Dictionary loading (parsing, error handling, malformed data)
+- Word form generation (plurals, verb conjugation)
+- Permutation generation
+- Input validation
+- Performance benchmarks
+
+**End-to-End Tests:**
+
+- Binary execution and help output
+- Error handling (missing files, empty puzzles)
+- Complete puzzle solving workflow
+- Debug mode functionality
+
+**Running Tests:**
+
+```bash
+# Go unit tests
+go test -v -cover
+
+# Python tests (Streamlit)
+cd streamlit_app && pytest --cov=solver
+
+# E2E tests
+./test_e2e.sh
+
+# All tests via CI
+./scripts/validate.sh
+```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
+
+- Setting up your development environment
+- Code style standards
+- Testing requirements
+- Commit message conventions
+- Pull request process
 
 ## How It Works
 

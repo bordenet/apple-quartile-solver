@@ -91,10 +91,14 @@ dist/
 ################################################################################
 coverage/
 coverage.txt
+coverage.out
+coverage.xml
 *.coverprofile
 *.lcov
 test-results/
 junit.xml
+.coverage
+htmlcov/
 
 ################################################################################
 # Logs and Temporary Files
@@ -120,3 +124,7 @@ builds/
 # Validation Logs
 ################################################################################
 .validation-logs/
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md

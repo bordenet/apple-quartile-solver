@@ -264,19 +264,19 @@ func main() {
 	}
 
 	if *dictionaryPath == "" || *puzzlePath == "" {
-		fmt.Println("Error: Both --dictionary and --puzzle are required")
-		fmt.Println("Run with --help for usage information")
+		fmt.Fprintf(os.Stderr, "Error: Both --dictionary and --puzzle are required\n")
+		fmt.Fprintf(os.Stderr, "Run with --help for usage information\n")
 		os.Exit(1)
 	}
 
 	// Validate input files exist
 	if _, err := os.Stat(*dictionaryPath); os.IsNotExist(err) {
-		fmt.Printf("Error: Dictionary file not found: %s\n", *dictionaryPath)
+		fmt.Fprintf(os.Stderr, "Error: Dictionary file not found: %s\n", *dictionaryPath)
 		os.Exit(1)
 	}
 
 	if _, err := os.Stat(*puzzlePath); os.IsNotExist(err) {
-		fmt.Printf("Error: Puzzle file not found: %s\n", *puzzlePath)
+		fmt.Fprintf(os.Stderr, "Error: Puzzle file not found: %s\n", *puzzlePath)
 		os.Exit(1)
 	}
 
@@ -289,7 +289,7 @@ func main() {
 	trie := NewTrieNode()
 	wordCount, err := loadDictionary(*dictionaryPath, trie, *debug)
 	if err != nil {
-		fmt.Printf("Error loading dictionary: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error loading dictionary from %s: %v\n", *dictionaryPath, err)
 		os.Exit(1)
 	}
 
@@ -301,7 +301,7 @@ func main() {
 	// Read puzzle file
 	puzzleFile, err := os.Open(*puzzlePath)
 	if err != nil {
-		fmt.Printf("Error opening puzzle file: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error opening puzzle file %s: %v\n", *puzzlePath, err)
 		os.Exit(1)
 	}
 	defer puzzleFile.Close()
@@ -316,12 +316,12 @@ func main() {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Printf("Error reading puzzle file: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Error reading puzzle file %s: %v\n", *puzzlePath, err)
 		os.Exit(1)
 	}
 
 	if len(tiles) == 0 {
-		fmt.Println("Error: Puzzle file is empty")
+		fmt.Fprintf(os.Stderr, "Error: Puzzle file %s is empty\n", *puzzlePath)
 		os.Exit(1)
 	}
 

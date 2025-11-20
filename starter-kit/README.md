@@ -6,7 +6,7 @@
 
 ## What Is This?
 
-This directory contains **hard-won lessons** from building a production-grade, multi-platform application (Flutter mobile, browser extensions, AWS backend, Go microservices). These documents capture engineering protocols, safety nets, and coding standards that took months to develop and debug.
+This directory contains engineering lessons from building multi-platform applications (Flutter mobile, browser extensions, AWS backend, Go microservices). These documents capture engineering protocols, safety nets, and coding standards.
 
 **Use this starter-kit to avoid repeating painful mistakes in future projects.**
 

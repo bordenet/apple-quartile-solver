@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  go-test:
+    name: Go Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+        
+    - name: Download dependencies
+      run: go mod download
+      
+    - name: Run go vet
+      run: go vet ./...
+      
+    - name: Check formatting
+      run: |
+        if [ -n "$(gofmt -l .)" ]; then
+          echo "Go code is not formatted:"
+          gofmt -l .
+          exit 1
+        fi
+        
+    - name: Run tests with coverage
+      run: go test -v -race -coverprofile=coverage.out -covermode=atomic ./...
+      
+    - name: Generate coverage report
+      run: go tool cover -func=coverage.out
+
+    - name: Run E2E tests
+      run: ./test_e2e.sh
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.out
+        flags: go
+        name: go-coverage
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
+        
+    - name: Check coverage threshold
+      run: |
+        coverage=$(go tool cover -func=coverage.out | grep total | awk '{print substr($3, 1, length($3)-1)}')
+        echo "Total coverage: ${coverage}%"
+        if (( $(echo "$coverage < 85.0" | bc -l) )); then
+          echo "::warning::Coverage ${coverage}% is below 85% threshold"
+        fi
+
+  go-build:
+    name: Go Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+        
+    - name: Build binary
+      run: go build -v -o applequartile${{ matrix.os == 'windows-latest' && '.exe' || '' }} .
+      
+    - name: Test binary execution
+      run: ./applequartile${{ matrix.os == 'windows-latest' && '.exe' || '' }} --help
+
+  python-test:
+    name: Python Tests (Streamlit)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      working-directory: streamlit_app
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-cov flake8 mypy
+        
+    - name: Run flake8
+      working-directory: streamlit_app
+      run: flake8 app.py solver/ --max-line-length=120 --extend-ignore=E203,W503
+      
+    - name: Run mypy
+      working-directory: streamlit_app
+      run: mypy app.py solver/ --ignore-missing-imports
+      continue-on-error: true
+      
+    - name: Run pytest
+      working-directory: streamlit_app
+      run: pytest --cov=solver --cov-report=xml --cov-report=term
+      continue-on-error: true
+      
+    - name: Upload Python coverage
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./streamlit_app/coverage.xml
+        flags: python
+        name: python-coverage
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
+
+  flutter-test:
+    name: Flutter Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+        channel: 'stable'
+        
+    - name: Install dependencies
+      working-directory: quartile_solver_web
+      run: flutter pub get
+      
+    - name: Analyze code
+      working-directory: quartile_solver_web
+      run: flutter analyze
+      
+    - name: Run tests
+      working-directory: quartile_solver_web
+      run: flutter test --coverage
+      continue-on-error: true
+      
+    - name: Upload Flutter coverage
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./quartile_solver_web/coverage/lcov.info
+        flags: flutter
+        name: flutter-coverage
+        token: ${{ secrets.CODECOV_TOKEN }}
+        fail_ci_if_error: false
+
