@@ -4,7 +4,7 @@ This document describes how the engineering starter-kit has been integrated into
 
 ## Overview
 
-The starter-kit provides battle-tested engineering best practices from production-grade projects, including:
+The starter-kit provides engineering best practices from real-world projects, including:
 - Standardized shell scripting conventions
 - Automated validation and safety nets
 - Pre-commit hooks for code quality
