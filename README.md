@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/bordenet/apple-quartile-solver/branch/main/graph/badge.svg)](https://codecov.io/gh/bordenet/apple-quartile-solver)
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)](https://go.dev/)
 [![Python Version](https://img.shields.io/badge/Python-3.8+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
-[![Flutter Version](https://img.shields.io/badge/Flutter-3.0+-02569B?logo=flutter)](https://flutter.dev/)
+[![Flutter Version](https://img.shields.io/badge/Flutter-3.27+-02569B?logo=flutter)](https://flutter.dev/)
 [![License](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)](LICENSE)
 
 Solves Apple News Quartile puzzles by finding valid English words from letter combinations using the WordNet dictionary.
