@@ -119,7 +119,11 @@ jobs:
       working-directory: streamlit_app
       run: pytest --cov=solver --cov-report=xml --cov-report=term
       continue-on-error: true
-      
+
+    - name: Test Streamlit can import
+      working-directory: streamlit_app
+      run: python -c "import app; print('✅ Streamlit app imports successfully')"
+
     - name: Upload Python coverage
       uses: codecov/codecov-action@v4
       with:
@@ -155,7 +159,22 @@ jobs:
       working-directory: quartile_solver_web
       run: flutter test --coverage
       continue-on-error: true
-      
+
+    - name: Download WordNet dictionary
+      run: |
+        curl -L -o WNprolog-3.0.tar.gz https://wordnetcode.princeton.edu/3.0/WNprolog-3.0.tar.gz
+        tar -xzf WNprolog-3.0.tar.gz
+
+    - name: Copy dictionary to Flutter assets
+      working-directory: quartile_solver_web
+      run: |
+        mkdir -p assets
+        cp ../prolog/wn_s.pl assets/
+
+    - name: Test Flutter web build
+      working-directory: quartile_solver_web
+      run: flutter build web --release
+
     - name: Upload Flutter coverage
       uses: codecov/codecov-action@v4
       with:

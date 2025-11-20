@@ -161,6 +161,48 @@ fi
 
 rm -f /tmp/test_dict.pl /tmp/test_puzzle.txt
 
+################################################################################
+# GUI Launch Tests
+################################################################################
+
+log_test "Testing Streamlit can import"
+if command -v python3 &> /dev/null; then
+    cd streamlit_app
+    if [ -d "venv" ]; then
+        # shellcheck source=/dev/null
+        source venv/bin/activate
+        if python3 -c "import app; print('✅ Streamlit app imports successfully')" &> /dev/null; then
+            log_pass "Streamlit app imports successfully"
+        else
+            log_fail "Streamlit app import failed"
+        fi
+        deactivate 2>/dev/null || true
+    else
+        log_fail "Streamlit venv not found (run ./scripts/setup-web.sh)"
+    fi
+    cd ..
+else
+    echo -e "${YELLOW}⊘${NC} Python not installed, skipping Streamlit test"
+fi
+
+log_test "Testing Flutter web can build"
+if command -v flutter &> /dev/null; then
+    cd quartile_solver_web
+    if [ -f "assets/wn_s.pl" ]; then
+        if flutter build web --release &> /tmp/flutter_build.log; then
+            log_pass "Flutter web builds successfully"
+        else
+            log_fail "Flutter web build failed"
+            cat /tmp/flutter_build.log
+        fi
+    else
+        log_fail "Flutter assets/wn_s.pl not found (run ./scripts/setup-web.sh)"
+    fi
+    cd ..
+else
+    echo -e "${YELLOW}⊘${NC} Flutter not installed, skipping GUI test"
+fi
+
 # Summary
 echo ""
 if [ $FAILURES -eq 0 ]; then

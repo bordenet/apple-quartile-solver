@@ -85,7 +85,7 @@ See [WEB_UI_README.md](WEB_UI_README.md) for detailed web UI documentation.
 
 ### Web UIs
 - **Streamlit**: Python 3.8+
-- **Flutter**: Flutter 3.0+, Dart 3.0+
+- **Flutter**: Flutter 3.27+, Dart 3.0+
 
 ## Setup
 

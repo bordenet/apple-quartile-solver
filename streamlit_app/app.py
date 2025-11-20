@@ -20,9 +20,15 @@ st.markdown(
     .main {
         background-color: #F2F2F7;
     }
+    /* Force dark text on all elements */
+    .stMarkdown, .stMarkdown p, .stMarkdown h1, .stMarkdown h2, .stMarkdown h3,
+    .stMarkdown h4, .stMarkdown h5, .stMarkdown h6, .stMarkdown li, .stMarkdown span,
+    .stTextInput label, .stTextArea label, .stSelectbox label, div[data-testid="stMarkdownContainer"] {
+        color: #1C1C1E !important;
+    }
     .stButton>button {
         background-color: #007AFF;
-        color: white;
+        color: white !important;
         border-radius: 8px;
         padding: 12px 24px;
         font-weight: 600;
@@ -43,6 +49,24 @@ st.markdown(
         padding: 12px;
         border-radius: 8px;
         margin: 8px 0;
+    }
+    /* Ensure text areas and inputs have dark text and visible borders */
+    .stTextArea textarea, .stTextInput input {
+        color: #1C1C1E !important;
+        border: 2px solid #C7C7CC !important;
+        background-color: white !important;
+    }
+    .stTextArea textarea:focus, .stTextInput input:focus {
+        border-color: #007AFF !important;
+    }
+    /* Fix selectbox borders */
+    .stSelectbox > div > div {
+        border: 2px solid #C7C7CC !important;
+        background-color: white !important;
+    }
+    /* Fix caption text */
+    .stCaption {
+        color: #6C6C70 !important;
     }
 </style>
 """,

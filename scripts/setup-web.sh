@@ -50,22 +50,37 @@ done
 
 setup_flutter() {
     log_section "Setting up Flutter Web UI"
-    
+
     require_command "flutter" "brew install flutter"
-    
+
     local flutter_version
     flutter_version=$(flutter --version | head -1 | awk '{print $2}')
     log_success "Flutter $flutter_version installed"
 
+    # Ensure dictionary is downloaded
+    if [[ ! -f "$REPO_ROOT/prolog/wn_s.pl" ]]; then
+        log_info "Downloading WordNet dictionary..."
+        cd "$REPO_ROOT" || die "Failed to change to repository root"
+        curl -L -o WNprolog-3.0.tar.gz https://wordnetcode.princeton.edu/3.0/WNprolog-3.0.tar.gz
+        tar -xzf WNprolog-3.0.tar.gz
+        log_success "Dictionary downloaded"
+    fi
+
     cd "$REPO_ROOT/quartile_solver_web" || die "Failed to change to Flutter directory"
-    
+
+    # Copy dictionary to Flutter assets
+    log_info "Copying dictionary to Flutter assets..."
+    mkdir -p assets
+    cp "$REPO_ROOT/prolog/wn_s.pl" assets/
+    log_success "Dictionary copied to assets/"
+
     log_info "Getting Flutter dependencies..."
     flutter pub get
     log_success "Flutter dependencies installed"
-    
+
     log_info "Running Flutter analyzer..."
     flutter analyze || log_warning "Flutter analyzer found issues (non-fatal)"
-    
+
     log_success "Flutter web UI setup complete"
 }
 

@@ -67,6 +67,7 @@ quartile_solver_web/.flutter-plugins
 quartile_solver_web/.flutter-plugins-dependencies
 quartile_solver_web/build/
 quartile_solver_web/pubspec.lock
+quartile_solver_web/assets/
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies

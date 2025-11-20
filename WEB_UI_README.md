@@ -46,7 +46,7 @@ Both implementations provide:
 
 ### Flutter Web
 - **Language**: Dart 3.0+
-- **Framework**: Flutter 3.0+
+- **Framework**: Flutter 3.27+
 - **Lines of Code**: ~900 total (modular architecture)
 - **Deployment**: Static hosting (GitHub Pages, Netlify, Vercel)
 - **Best For**: Production apps, PWAs, offline support, mobile-first
