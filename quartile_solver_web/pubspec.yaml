@@ -20,6 +20,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # assets:
-  #   - assets/wn_s.pl  # Dictionary loaded from web, not bundled
+  assets:
+    - assets/wn_s.pl
 

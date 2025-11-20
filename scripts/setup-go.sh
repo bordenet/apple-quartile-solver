@@ -30,13 +30,24 @@ main() {
 
     log_section "Checking Go installation"
     require_command "go" "brew install go"
-    
+
     local go_version
     go_version=$(go version | awk '{print $3}' | sed 's/go//')
     log_success "Go $go_version installed"
 
-    log_section "Downloading Go dependencies"
     cd "$REPO_ROOT" || die "Failed to change to repository root"
+
+    log_section "Downloading WordNet dictionary"
+    if [[ ! -f "prolog/wn_s.pl" ]]; then
+        log_info "Downloading WordNet 3.0 Prolog database..."
+        curl -L -o WNprolog-3.0.tar.gz https://wordnetcode.princeton.edu/3.0/WNprolog-3.0.tar.gz
+        tar -xzf WNprolog-3.0.tar.gz
+        log_success "Dictionary downloaded and extracted"
+    else
+        log_info "Dictionary already exists, skipping download"
+    fi
+
+    log_section "Downloading Go dependencies"
     go mod download
     log_success "Dependencies downloaded"
 
@@ -50,7 +61,7 @@ main() {
 
     log_success "Go setup complete!"
     echo ""
-    log_info "Run the solver with: ./applequartile --help"
+    log_info "Run the solver with: ./applequartile --dictionary ./prolog/wn_s.pl --puzzle ./samples/puzzle1.txt"
 }
 
 main "$@"
