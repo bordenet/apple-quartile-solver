@@ -150,15 +150,6 @@ jobs:
     - name: Install dependencies
       working-directory: quartile_solver_web
       run: flutter pub get
-      
-    - name: Analyze code
-      working-directory: quartile_solver_web
-      run: flutter analyze
-      
-    - name: Run tests
-      working-directory: quartile_solver_web
-      run: flutter test --coverage
-      continue-on-error: true
 
     - name: Download WordNet dictionary
       run: |
@@ -170,6 +161,15 @@ jobs:
       run: |
         mkdir -p assets
         cp ../prolog/wn_s.pl assets/
+
+    - name: Analyze code
+      working-directory: quartile_solver_web
+      run: flutter analyze
+
+    - name: Run tests
+      working-directory: quartile_solver_web
+      run: flutter test --coverage
+      continue-on-error: true
 
     - name: Test Flutter web build
       working-directory: quartile_solver_web

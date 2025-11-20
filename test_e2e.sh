@@ -178,7 +178,7 @@ if command -v python3 &> /dev/null; then
         fi
         deactivate 2>/dev/null || true
     else
-        log_fail "Streamlit venv not found (run ./scripts/setup-web.sh)"
+        echo -e "${YELLOW}⊘${NC} Streamlit venv not found, skipping test (run ./scripts/setup-web.sh to set up)"
     fi
     cd ..
 else
@@ -196,7 +196,7 @@ if command -v flutter &> /dev/null; then
             cat /tmp/flutter_build.log
         fi
     else
-        log_fail "Flutter assets/wn_s.pl not found (run ./scripts/setup-web.sh)"
+        echo -e "${YELLOW}⊘${NC} Flutter assets/wn_s.pl not found, skipping test (run ./scripts/setup-web.sh to set up)"
     fi
     cd ..
 else
