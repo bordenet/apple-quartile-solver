@@ -274,6 +274,24 @@ All code files are under 400 lines for maintainability.
 - **[starter-kit/SHELL_SCRIPT_STANDARDS.md](starter-kit/SHELL_SCRIPT_STANDARDS.md)** - Shell scripting conventions
 - **[starter-kit/DEVELOPMENT_PROTOCOLS.md](starter-kit/DEVELOPMENT_PROTOCOLS.md)** - Development workflows
 
+---
+
+## Code Coverage
+
+Apple Quartile Solver maintains comprehensive test coverage across Go and Python components. The coverage visualization below shows detailed coverage by module:
+
+[![Coverage Grid](https://codecov.io/gh/bordenet/apple-quartile-solver/graphs/tree.svg)](https://codecov.io/gh/bordenet/apple-quartile-solver)
+
+**What this means:**
+- **Green**: Well-tested code (>80% coverage)
+- **Yellow**: Moderate coverage (60-80%)
+- **Red**: Needs more tests (<60%)
+- **Size**: Larger boxes = more lines of code
+
+Click the image to explore detailed coverage reports on Codecov, including line-by-line coverage, branch coverage, and historical trends.
+
+---
+
 ## License
 
 MIT License - See [LICENSE](LICENSE) file for details.
