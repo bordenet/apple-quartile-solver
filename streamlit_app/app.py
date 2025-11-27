@@ -165,7 +165,7 @@ def main() -> None:
         )
 
         # Puzzle input
-        default_text = SAMPLE_PUZZLES.get(sample_choice, "")
+        default_text = SAMPLE_PUZZLES.get(sample_choice or "", "")
         puzzle_input = st.text_area(
             "Enter puzzle tiles (one per line)",
             value=default_text,

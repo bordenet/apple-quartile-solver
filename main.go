@@ -8,6 +8,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"strings"
@@ -267,6 +268,66 @@ func printHelp() {
 	fmt.Println("  tar -xzf WNprolog-3.0.tar.gz")
 }
 
+// run executes the main application logic with the given parameters.
+// It returns an error if any step fails, allowing for testable error handling.
+func run(dictionaryPath, puzzlePath string, debug bool, w io.Writer) error {
+	// Validate input files exist
+	if _, err := os.Stat(dictionaryPath); os.IsNotExist(err) {
+		return fmt.Errorf("dictionary file not found: %s", dictionaryPath)
+	}
+
+	if _, err := os.Stat(puzzlePath); os.IsNotExist(err) {
+		return fmt.Errorf("puzzle file not found: %s", puzzlePath)
+	}
+
+	startTime := time.Now()
+
+	if !debug {
+		fmt.Fprintln(w, "Loading dictionary from:", dictionaryPath)
+	}
+
+	trie := NewTrieNode()
+	wordCount, err := loadDictionary(dictionaryPath, trie, debug)
+	if err != nil {
+		return fmt.Errorf("loading dictionary from %s: %w", dictionaryPath, err)
+	}
+
+	if debug {
+		loadDuration := time.Since(startTime)
+		fmt.Fprintf(w, "Loaded %d words into trie in %v\n", wordCount, loadDuration)
+	}
+
+	// Read puzzle file
+	puzzleFile, err := os.Open(puzzlePath)
+	if err != nil {
+		return fmt.Errorf("opening puzzle file %s: %w", puzzlePath, err)
+	}
+	defer puzzleFile.Close()
+
+	var tiles []string
+	scanner := bufio.NewScanner(puzzleFile)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line != "" {
+			tiles = append(tiles, line)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return fmt.Errorf("reading puzzle file %s: %w", puzzlePath, err)
+	}
+
+	if len(tiles) == 0 {
+		return fmt.Errorf("puzzle file %s is empty", puzzlePath)
+	}
+
+	// Generate all permutations and validate against dictionary
+	perms := generatePermutations(tiles, 4)
+	checkInTrie(trie, perms, debug)
+
+	return nil
+}
+
 func main() {
 	debug := flag.Bool("debug", false, "Enable debug mode")
 	dictionaryPath := flag.String("dictionary", "", "Path to the dictionary file")
@@ -285,63 +346,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Validate input files exist
-	if _, err := os.Stat(*dictionaryPath); os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "Error: Dictionary file not found: %s\n", *dictionaryPath)
+	if err := run(*dictionaryPath, *puzzlePath, *debug, os.Stdout); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
-
-	if _, err := os.Stat(*puzzlePath); os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "Error: Puzzle file not found: %s\n", *puzzlePath)
-		os.Exit(1)
-	}
-
-	startTime := time.Now()
-
-	if !*debug {
-		fmt.Println("Loading dictionary from:", *dictionaryPath)
-	}
-
-	trie := NewTrieNode()
-	wordCount, err := loadDictionary(*dictionaryPath, trie, *debug)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading dictionary from %s: %v\n", *dictionaryPath, err)
-		os.Exit(1)
-	}
-
-	if *debug {
-		loadDuration := time.Since(startTime)
-		fmt.Printf("Loaded %d words into trie in %v\n", wordCount, loadDuration)
-	}
-
-	// Read puzzle file
-	puzzleFile, err := os.Open(*puzzlePath)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error opening puzzle file %s: %v\n", *puzzlePath, err)
-		os.Exit(1)
-	}
-	defer puzzleFile.Close()
-
-	var tiles []string
-	scanner := bufio.NewScanner(puzzleFile)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line != "" {
-			tiles = append(tiles, line)
-		}
-	}
-
-	if err := scanner.Err(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading puzzle file %s: %v\n", *puzzlePath, err)
-		os.Exit(1)
-	}
-
-	if len(tiles) == 0 {
-		fmt.Fprintf(os.Stderr, "Error: Puzzle file %s is empty\n", *puzzlePath)
-		os.Exit(1)
-	}
-
-	// Generate all permutations and validate against dictionary
-	permutations := generatePermutations(tiles, 4)
-	checkInTrie(trie, permutations, *debug)
 }

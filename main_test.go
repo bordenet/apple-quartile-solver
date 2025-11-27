@@ -2,12 +2,105 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"flag"
 	"io"
 	"os"
 	"strings"
 	"testing"
 )
+
+// TestRun tests the run function with various scenarios.
+func TestRun(t *testing.T) {
+	// Create temporary dictionary file
+	dictContent := `s(100000001,1,'cat',n,1,3).
+s(100000002,1,'dog',n,1,3).
+s(100000003,1,'run',v,1,3).`
+
+	dictFile, err := os.CreateTemp("", "test_dict*.pl")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(dictFile.Name())
+	if _, err := dictFile.Write([]byte(dictContent)); err != nil {
+		t.Fatal(err)
+	}
+	dictFile.Close()
+
+	// Create temporary puzzle file
+	puzzleContent := "ca\nt"
+	puzzleFile, err := os.CreateTemp("", "test_puzzle*.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(puzzleFile.Name())
+	if _, err := puzzleFile.Write([]byte(puzzleContent)); err != nil {
+		t.Fatal(err)
+	}
+	puzzleFile.Close()
+
+	t.Run("successful run", func(t *testing.T) {
+		var buf bytes.Buffer
+		err := run(dictFile.Name(), puzzleFile.Name(), false, &buf)
+		if err != nil {
+			t.Errorf("run() unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "Loading dictionary") {
+			t.Error("Expected output to contain 'Loading dictionary'")
+		}
+	})
+
+	t.Run("debug mode", func(t *testing.T) {
+		var buf bytes.Buffer
+		err := run(dictFile.Name(), puzzleFile.Name(), true, &buf)
+		if err != nil {
+			t.Errorf("run() unexpected error: %v", err)
+		}
+		if !strings.Contains(buf.String(), "Loaded") {
+			t.Error("Expected debug output to contain 'Loaded'")
+		}
+	})
+
+	t.Run("dictionary not found", func(t *testing.T) {
+		var buf bytes.Buffer
+		err := run("/nonexistent/dict.pl", puzzleFile.Name(), false, &buf)
+		if err == nil {
+			t.Error("Expected error for missing dictionary")
+		}
+		if !strings.Contains(err.Error(), "dictionary file not found") {
+			t.Errorf("Expected 'dictionary file not found' error, got: %v", err)
+		}
+	})
+
+	t.Run("puzzle not found", func(t *testing.T) {
+		var buf bytes.Buffer
+		err := run(dictFile.Name(), "/nonexistent/puzzle.txt", false, &buf)
+		if err == nil {
+			t.Error("Expected error for missing puzzle")
+		}
+		if !strings.Contains(err.Error(), "puzzle file not found") {
+			t.Errorf("Expected 'puzzle file not found' error, got: %v", err)
+		}
+	})
+
+	t.Run("empty puzzle file", func(t *testing.T) {
+		emptyPuzzle, err := os.CreateTemp("", "empty_puzzle*.txt")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(emptyPuzzle.Name())
+		emptyPuzzle.Close()
+
+		var buf bytes.Buffer
+		err = run(dictFile.Name(), emptyPuzzle.Name(), false, &buf)
+		if err == nil {
+			t.Error("Expected error for empty puzzle")
+		}
+		if !strings.Contains(err.Error(), "is empty") {
+			t.Errorf("Expected 'is empty' error, got: %v", err)
+		}
+	})
+}
 
 func TestTrieNode_Insert(t *testing.T) {
 	trie := NewTrieNode()
@@ -455,6 +548,24 @@ func BenchmarkGeneratePermutations(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		generatePermutations(lines, 3)
+	}
+}
+
+func BenchmarkCombinations(b *testing.B) {
+	tiles := []string{"abc", "def", "ghi", "jkl", "mno", "pqr"}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		combinations(tiles, 3)
+	}
+}
+
+func BenchmarkGeneratePlural(b *testing.B) {
+	words := []string{"dog", "cat", "bus", "fox", "baby", "city", "dish", "watch"}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for _, word := range words {
+			generatePlural(word)
+		}
 	}
 }
 

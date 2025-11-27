@@ -14,7 +14,7 @@ Solves Apple News Quartile puzzles by finding valid English words from letter co
 - **Multiple Interfaces**: Command-line (Go), Web UI (Flutter), and Streamlit (Python)
 - **Fast Performance**: Solves 20-tile puzzles in under 1 second
 - **Comprehensive Dictionary**: WordNet 3.0 with 117k+ base words
-- **Automated Testing**: 70%+ code coverage with unit and E2E tests
+- **Automated Testing**: 88%+ code coverage with unit, E2E, and benchmark tests
 - **CI/CD Pipeline**: Automated testing and validation on every commit
 
 ## Table of Contents
