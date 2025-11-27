@@ -1,20 +1,30 @@
-"""Quartile puzzle solver"""
+"""Quartile puzzle solver.
+
+This module provides the core puzzle-solving functionality for the
+Apple Quartile Solver. It generates all possible word combinations
+from puzzle tiles and validates them against a dictionary trie.
+"""
 
 from itertools import combinations, permutations
-from typing import List, Set
+from typing import List, Set, Tuple
+
 from .trie import TrieNode
 
 
-def solve_puzzle(tiles: List[str], trie: TrieNode) -> tuple[List[str], int]:
-    """
-    Solve a Quartile puzzle
+def solve_puzzle(tiles: List[str], trie: TrieNode) -> Tuple[List[str], int]:
+    """Solve a Quartile puzzle by finding all valid words from tile combinations.
+
+    Generates all permutations of 1-4 tile combinations and checks each
+    against the dictionary trie to find valid English words.
 
     Args:
-        tiles: List of puzzle tiles
-        trie: Dictionary trie
+        tiles: List of puzzle tiles (letter combinations).
+        trie: Dictionary trie containing valid words.
 
     Returns:
-        Tuple of (valid_words, permutations_checked)
+        Tuple containing:
+            - List[str]: Sorted list of valid words found
+            - int: Total number of permutations checked
     """
     valid_words: Set[str] = set()
     permutations_checked = 0
@@ -33,16 +43,33 @@ def solve_puzzle(tiles: List[str], trie: TrieNode) -> tuple[List[str], int]:
 
 
 def parse_puzzle_input(text: str) -> List[str]:
-    """Parse puzzle input text into list of tiles"""
+    """Parse puzzle input text into a list of tiles.
+
+    Splits the input text by newlines, strips whitespace, and converts
+    to lowercase.
+
+    Args:
+        text: Raw puzzle input text with tiles separated by newlines.
+
+    Returns:
+        List of cleaned tile strings.
+    """
     return [line.strip().lower() for line in text.strip().split("\n") if line.strip()]
 
 
-def validate_puzzle(tiles: List[str]) -> tuple[bool, str]:
-    """
-    Validate puzzle format
+def validate_puzzle(tiles: List[str]) -> Tuple[bool, str]:
+    """Validate puzzle format and constraints.
+
+    Checks that the puzzle has a valid number of tiles and that each
+    tile meets length requirements.
+
+    Args:
+        tiles: List of puzzle tiles to validate.
 
     Returns:
-        Tuple of (is_valid, error_message)
+        Tuple containing:
+            - bool: True if the puzzle is valid, False otherwise
+            - str: Error message if invalid, empty string if valid
     """
     if not tiles:
         return False, "No tiles entered"
