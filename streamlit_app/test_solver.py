@@ -1,53 +1,60 @@
-"""Tests for the Quartile solver package"""
+"""Tests for the Quartile solver package.
+
+This module contains unit tests for all components of the solver package,
+including the trie data structure, dictionary loading, puzzle solving,
+and word form generation.
+"""
+
+import os
+import tempfile
 
 import pytest
-import tempfile
-import os
+
 from solver import (
     TrieNode,
-    load_dictionary,
-    solve_puzzle,
-    parse_puzzle_input,
-    validate_puzzle,
     generate_plural,
     generate_verb_forms,
+    load_dictionary,
+    parse_puzzle_input,
+    solve_puzzle,
+    validate_puzzle,
 )
 
 
 class TestTrieNode:
-    """Test cases for TrieNode class"""
+    """Test cases for TrieNode class."""
 
-    def test_insert_and_search(self):
-        """Test basic insert and search operations"""
+    def test_insert_and_search(self) -> None:
+        """Test basic insert and search operations."""
         trie = TrieNode()
         trie.insert("hello")
         assert trie.search("hello")
         assert not trie.search("hell")
         assert not trie.search("helloworld")
 
-    def test_empty_string(self):
-        """Test handling of empty string"""
+    def test_empty_string(self) -> None:
+        """Test handling of empty string."""
         trie = TrieNode()
         trie.insert("")
         assert trie.search("")
 
-    def test_unicode_characters(self):
-        """Test handling of unicode characters"""
+    def test_unicode_characters(self) -> None:
+        """Test handling of unicode characters."""
         trie = TrieNode()
         trie.insert("café")
         assert trie.search("café")
         assert not trie.search("cafe")
 
-    def test_word_count(self):
-        """Test word count functionality"""
+    def test_word_count(self) -> None:
+        """Test word count functionality."""
         trie = TrieNode()
         trie.insert("cat")
         trie.insert("dog")
         trie.insert("bird")
         assert trie.word_count() == 3
 
-    def test_prefix_not_word(self):
-        """Test that prefixes are not counted as words"""
+    def test_prefix_not_word(self) -> None:
+        """Test that prefixes are not counted as words."""
         trie = TrieNode()
         trie.insert("testing")
         assert not trie.search("test")
@@ -55,15 +62,15 @@ class TestTrieNode:
 
 
 class TestDictionaryLoading:
-    """Test cases for dictionary loading"""
+    """Test cases for dictionary loading."""
 
-    def test_load_dictionary(self):
-        """Test loading a dictionary file"""
+    def test_load_dictionary(self) -> None:
+        """Test loading a dictionary file."""
         content = """s(100000001,1,'dog',n,1,6).
 s(100000002,1,'cat',n,1,3).
 s(100000003,1,'run',v,1,3)."""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.pl', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".pl", delete=False) as f:
             f.write(content)
             temp_path = f.name
 
@@ -78,12 +85,12 @@ s(100000003,1,'run',v,1,3)."""
         finally:
             os.unlink(temp_path)
 
-    def test_skip_capitalized_words(self):
-        """Test that capitalized words are skipped"""
+    def test_skip_capitalized_words(self) -> None:
+        """Test that capitalized words are skipped."""
         content = """s(100000001,1,'PROPER',n,1,6).
 s(100000002,1,'normal',n,1,3)."""
 
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.pl', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".pl", delete=False) as f:
             f.write(content)
             temp_path = f.name
 
@@ -97,10 +104,10 @@ s(100000002,1,'normal',n,1,3)."""
 
 
 class TestSolver:
-    """Test cases for puzzle solver"""
+    """Test cases for puzzle solver."""
 
-    def test_solve_simple_puzzle(self):
-        """Test solving a simple puzzle"""
+    def test_solve_simple_puzzle(self) -> None:
+        """Test solving a simple puzzle."""
         trie = TrieNode()
         trie.insert("cat")
         trie.insert("at")
@@ -114,40 +121,40 @@ class TestSolver:
         assert "act" in words
         assert perms_checked > 0
 
-    def test_parse_puzzle_input(self):
-        """Test parsing puzzle input"""
+    def test_parse_puzzle_input(self) -> None:
+        """Test parsing puzzle input."""
         input_text = "dis\ncre\nti\non"
         tiles = parse_puzzle_input(input_text)
         assert tiles == ["dis", "cre", "ti", "on"]
 
-    def test_parse_puzzle_input_with_whitespace(self):
-        """Test parsing with extra whitespace"""
+    def test_parse_puzzle_input_with_whitespace(self) -> None:
+        """Test parsing with extra whitespace."""
         input_text = "  dis  \n\n  cre  \n  ti  "
         tiles = parse_puzzle_input(input_text)
         assert tiles == ["dis", "cre", "ti"]
 
-    def test_validate_puzzle_empty(self):
-        """Test validation of empty puzzle"""
+    def test_validate_puzzle_empty(self) -> None:
+        """Test validation of empty puzzle."""
         is_valid, error = validate_puzzle([])
         assert not is_valid
         assert "No tiles" in error
 
-    def test_validate_puzzle_too_many_tiles(self):
-        """Test validation of puzzle with too many tiles"""
+    def test_validate_puzzle_too_many_tiles(self) -> None:
+        """Test validation of puzzle with too many tiles."""
         tiles = ["tile"] * 21
         is_valid, error = validate_puzzle(tiles)
         assert not is_valid
         assert "Too many" in error
 
-    def test_validate_puzzle_tile_too_long(self):
-        """Test validation of tile that's too long"""
+    def test_validate_puzzle_tile_too_long(self) -> None:
+        """Test validation of tile that's too long."""
         tiles = ["a" * 11]
         is_valid, error = validate_puzzle(tiles)
         assert not is_valid
         assert "too long" in error
 
-    def test_validate_puzzle_valid(self):
-        """Test validation of valid puzzle"""
+    def test_validate_puzzle_valid(self) -> None:
+        """Test validation of valid puzzle."""
         tiles = ["dis", "cre", "ti", "on"]
         is_valid, error = validate_puzzle(tiles)
         assert is_valid
@@ -155,28 +162,28 @@ class TestSolver:
 
 
 class TestWordGeneration:
-    """Test cases for word form generation"""
+    """Test cases for word form generation."""
 
-    def test_generate_plural_regular(self):
-        """Test regular plural generation"""
+    def test_generate_plural_regular(self) -> None:
+        """Test regular plural generation."""
         assert generate_plural("cat") == "cats"
         assert generate_plural("dog") == "dogs"
 
-    def test_generate_plural_special_endings(self):
-        """Test plural generation for special endings"""
+    def test_generate_plural_special_endings(self) -> None:
+        """Test plural generation for special endings."""
         assert generate_plural("box") == "boxes"
         assert generate_plural("church") == "churches"
         assert generate_plural("dish") == "dishes"
         assert generate_plural("buzz") == "buzzes"
 
-    def test_generate_plural_y_ending(self):
-        """Test plural generation for words ending in y"""
+    def test_generate_plural_y_ending(self) -> None:
+        """Test plural generation for words ending in y."""
         assert generate_plural("fly") == "flies"
         assert generate_plural("boy") == "boys"  # vowel before y
         assert generate_plural("key") == "keys"  # vowel before y
 
-    def test_generate_verb_forms(self):
-        """Test verb form generation"""
+    def test_generate_verb_forms(self) -> None:
+        """Test verb form generation."""
         past, participle = generate_verb_forms("walk")
         assert past == "walked"
         assert participle == "walking"

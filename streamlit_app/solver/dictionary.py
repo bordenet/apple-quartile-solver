@@ -1,16 +1,31 @@
-"""Dictionary loading and management"""
+"""Dictionary loading and management.
+
+This module handles loading the WordNet Prolog dictionary file and
+populating a trie data structure with words and their generated forms
+(plurals for nouns, verb conjugations for verbs).
+"""
 
 import re
+from typing import Tuple
+
 from .trie import TrieNode
 from .word_generator import generate_plural, generate_verb_forms
 
 
-def load_dictionary(dictionary_path: str) -> tuple[TrieNode, int]:
-    """
-    Load WordNet dictionary and build trie
+def load_dictionary(dictionary_path: str) -> Tuple[TrieNode, int]:
+    """Load a WordNet dictionary file and build a trie data structure.
+
+    Parses the WordNet Prolog format and extracts words, generating
+    additional forms (plurals for nouns, past tense and participles
+    for verbs).
+
+    Args:
+        dictionary_path: Path to the WordNet Prolog dictionary file (wn_s.pl).
 
     Returns:
-        Tuple of (trie, word_count)
+        Tuple containing:
+            - TrieNode: The populated trie data structure
+            - int: The total number of words loaded (including generated forms)
     """
     trie = TrieNode()
     word_count = 0

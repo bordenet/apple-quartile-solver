@@ -1,13 +1,22 @@
+// Package main implements the Apple Quartile Solver CLI.
+// It solves Apple News Quartile puzzles by finding valid English words
+// from letter tile combinations using the WordNet dictionary.
 package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
 	"time"
+)
+
+// Sentinel errors for common failure cases.
+var (
+	ErrEmptyPuzzle = errors.New("puzzle file is empty")
 )
 
 // ANSI color codes for terminal output
@@ -90,12 +99,19 @@ func generateVerbForms(word string) (past, participle string) {
 }
 
 // loadDictionary loads words from a WordNet Prolog file into the trie.
-// It parses the WordNet synset format and generates common word forms.
+// It parses the WordNet synset format and generates common word forms
+// (plurals for nouns, past tense and participles for verbs).
+//
+// Parameters:
+//   - dictionaryPath: path to the WordNet Prolog dictionary file (wn_s.pl)
+//   - trie: the trie data structure to populate with words
+//   - debug: if true, prints verbose parsing information
+//
 // Returns the number of words loaded and any error encountered.
 func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, error) {
 	dictionaryFile, err := os.Open(dictionaryPath)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("opening dictionary file: %w", err)
 	}
 	defer dictionaryFile.Close()
 
@@ -150,7 +166,7 @@ func loadDictionary(dictionaryPath string, trie *TrieNode, debug bool) (int, err
 	}
 
 	if err := scanner.Err(); err != nil {
-		return 0, err
+		return 0, fmt.Errorf("scanning dictionary file: %w", err)
 	}
 
 	return wordCount, nil

@@ -1,9 +1,21 @@
-"""Apple Quartile Solver - Streamlit Web Interface"""
+"""Apple Quartile Solver - Streamlit Web Interface.
 
-import streamlit as st
+This module provides a web-based user interface for the Apple Quartile puzzle solver.
+It uses Streamlit to create an interactive application that allows users to input
+puzzle tiles and find valid English words from the WordNet dictionary.
+
+Usage:
+    streamlit run app.py
+"""
+
 import time
 from pathlib import Path
+from typing import Tuple
+
+import streamlit as st
+
 from solver import load_dictionary, solve_puzzle, parse_puzzle_input, validate_puzzle
+from solver.trie import TrieNode
 
 # Page configuration
 st.set_page_config(
@@ -99,8 +111,20 @@ SAMPLE_PUZZLES = {
 
 
 @st.cache_resource
-def initialize_dictionary():
-    """Load dictionary once and cache it"""
+def initialize_dictionary() -> Tuple[TrieNode, int]:
+    """Load the WordNet dictionary and cache it for reuse.
+
+    This function loads the dictionary once and caches it using Streamlit's
+    cache_resource decorator to avoid reloading on each page refresh.
+
+    Returns:
+        Tuple containing:
+            - TrieNode: The populated trie data structure
+            - int: The number of words loaded into the dictionary
+
+    Raises:
+        SystemExit: If the dictionary file is not found.
+    """
     dictionary_path = Path(__file__).parent.parent / "prolog" / "wn_s.pl"
 
     if not dictionary_path.exists():
@@ -113,7 +137,13 @@ def initialize_dictionary():
     return trie, word_count
 
 
-def main():
+def main() -> None:
+    """Run the Streamlit web application.
+
+    This is the main entry point for the Streamlit app. It initializes the
+    dictionary, renders the UI components, and handles user interactions
+    for solving Quartile puzzles.
+    """
     # Initialize dictionary
     trie, dict_word_count = initialize_dictionary()
 
