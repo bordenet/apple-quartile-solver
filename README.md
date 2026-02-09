@@ -75,7 +75,7 @@ mkdir -p assets && cp ../prolog/wn_s.pl assets/
 flutter run -d chrome
 ```
 
-See [WEB_UI_README.md](WEB_UI_README.md) for detailed web UI documentation.
+See [docs/WEB_UI_GUIDE.md](docs/WEB_UI_GUIDE.md) for detailed web UI documentation.
 
 ## Prerequisites
 
@@ -262,7 +262,7 @@ All code files are under 400 lines for maintainability.
 ## Documentation
 
 ### User Documentation
-- **[WEB_UI_README.md](WEB_UI_README.md)** - Web interface overview and quick start
+- **[docs/WEB_UI_GUIDE.md](docs/WEB_UI_GUIDE.md)** - Web interface overview and quick start
 - **[docs/PRD.md](docs/PRD.md)** - Product requirements document
 - **[docs/DESIGN_SPEC.md](docs/DESIGN_SPEC.md)** - Technical design specification
 - **[docs/VISUAL_DESIGN.md](docs/VISUAL_DESIGN.md)** - Visual design system
